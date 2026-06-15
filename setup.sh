@@ -27,7 +27,7 @@ fi
 echo "==> [1/6] Установка пакетов (Apache, MySQL, PHP)…"
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -y
-apt-get install -y apache2 mysql-server php libapache2-mod-php php-mysql
+apt-get install -y apache2 mysql-server php libapache2-mod-php php-mysql php-mbstring
 
 echo "==> [2/6] Запуск служб…"
 systemctl enable --now apache2

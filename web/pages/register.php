@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($fio === '')                                   $errors[] = 'Укажите ФИО.';
     if (!filter_var($login, FILTER_VALIDATE_EMAIL))    $errors[] = 'Укажите корректный e-mail (он же логин).';
-    if (mb_strlen($pass) < 6)                          $errors[] = 'Пароль не короче 6 символов.';
+    if (strlen($pass) < 6)                             $errors[] = 'Пароль не короче 6 символов.';
     if ($pass !== $pass2)                              $errors[] = 'Пароли не совпадают.';
 
     if (!$errors) {
