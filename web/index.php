@@ -73,29 +73,19 @@ if ($manage): ?>
 
 <div class="grid">
   <?php foreach ($products as $p):
-      $discount = (int)$p['discount'];
-      $price    = (float)$p['price'];
-      $final    = round($price * (1 - $discount / 100), 2);
+      $sale     = (int)$p['discount'] > 17;
       $outStock = (int)$p['stock_qty'] === 0;
-      $state    = $outStock ? 'oos' : ($discount > 15 ? 'sale' : '');
   ?>
-    <div class="card <?= $state ?>">
+    <div class="card <?= $sale ? 'sale' : '' ?>">
       <img class="photo" src="<?= e(photo_src($p['photo'])) ?>" alt="<?= e($p['name']) ?>">
       <h3><?= e($p['name']) ?></h3>
       <div class="meta">
         <span class="badge"><?= e($p['cat_name']) ?></span><br>
         <?= e($p['description']) ?><br>
         <small>Поставщик: <?= e($p['sup_name']) ?> · Производитель: <?= e($p['man_name']) ?></small><br>
-        <small>Артикул: <?= e($p['article']) ?> · На складе: <?= (int)$p['stock_qty'] ?> <?= e($p['unit_name']) ?> · Скидка: <?= $discount ?>%</small>
+        <small>Артикул: <?= e($p['article']) ?> · На складе: <?= (int)$p['stock_qty'] ?> <?= e($p['unit_name']) ?> · Скидка: <?= (int)$p['discount'] ?>%</small>
       </div>
-      <div class="price">
-        <?php if ($discount > 0): ?>
-          <span class="old"><?= number_format($price, 2, ',', ' ') ?> ₽</span>
-          <span class="new"><?= number_format($final, 2, ',', ' ') ?> ₽</span>
-        <?php else: ?>
-          <span class="new"><?= number_format($price, 2, ',', ' ') ?> ₽</span>
-        <?php endif; ?>
-      </div>
+      <div class="price <?= $outStock ? 'out' : '' ?>"><?= number_format((float)$p['price'], 2, ',', ' ') ?> ₽</div>
       <?php if (is_admin()): ?>
         <div style="margin-top:10px; display:flex; gap:8px;">
           <a class="btn" href="index.php?page=product_edit&article=<?= e($p['article']) ?>">Изменить</a>

@@ -70,20 +70,14 @@ function layout_header(string $title): void {
   .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:20px; }
   .card{ border:1px solid var(--line); border-radius:var(--radius); background:#fff; padding:16px;
          display:flex; flex-direction:column; box-shadow:var(--shadow); }
-  .card.sale{ background:#2E8B57; border-color:#256e45; color:#fff; }
-  .card.sale .meta, .card.sale .meta small{ color:#e9f7ef; }
-  .card.sale .badge{ background:#fff; color:#256e45; }
-  .card.sale .price .new{ color:#fff; }
-  .card.oos{ background:#D6ECFF; border-color:#9cc6ec; }
+  .card.sale{ background:var(--sale); border-color:var(--accent); }
   .card img.photo{ width:100%; height:190px; object-fit:contain; background:#fbf9f5;
                    border-radius:var(--radius-sm); padding:8px; }
   .card h3{ font-size:15px; font-weight:700; line-height:1.35; margin:14px 0 8px; }
   .card .meta{ font-size:13px; color:var(--muted); line-height:1.55; flex:1; }
   .card .meta small{ color:var(--muted); }
-  .price{ font-size:22px; font-weight:800; letter-spacing:-.02em; margin-top:12px;
-          display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; }
-  .price .old{ color:#e0322f; text-decoration:line-through; font-weight:600; font-size:16px; }
-  .price .new{ color:#000; }
+  .price{ font-size:22px; font-weight:800; letter-spacing:-.02em; margin-top:12px; }
+  .price.out{ color:#e0322f; }
 
   .badge{ display:inline-block; background:var(--secondary); color:#5b4a31; font-size:11px; font-weight:700;
           letter-spacing:.02em; text-transform:uppercase; padding:4px 10px; border-radius:999px; margin-bottom:6px; }
