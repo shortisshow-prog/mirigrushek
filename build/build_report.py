@@ -329,14 +329,32 @@ bullets([
     'Вход под ролями (администратор / менеджер / клиент) и проверка прав доступа.',
     'Файл отчёта доступен на сервере: http://<IP-сервера>/report.docx.',
 ])
-para('Ниже размещаются скриншоты корректной работы приложения (вставляются после развёртывания):',
-     italic=True, after=2)
-for cap in ['Рисунок 1 — окно входа / регистрации',
-            'Рисунок 2 — каталог товаров (подсветка скидки и отсутствия на складе)',
-            'Рисунок 3 — список заказов',
-            'Рисунок 4 — подключение в MySQL Workbench']:
-    para('[ место для скриншота ]', align=WD_ALIGN_PARAGRAPH.CENTER, after=0)
-    para(cap, italic=True, size=10, align=WD_ALIGN_PARAGRAPH.CENTER, after=10)
+para('Проведена отладка: приложение работает корректно, аварийного завершения не происходит '
+     '(валидация ввода, обработка исключений, защита от удаления связанных записей). '
+     'Скриншоты корректной работы приложения:', italic=True, after=8)
+
+from PIL import Image, ImageChops
+
+def trim_bottom(path):
+    im = Image.open(path).convert('RGB')
+    bg = Image.new('RGB', im.size, (255, 255, 255))
+    bbox = ImageChops.difference(im, bg).getbbox()
+    if bbox:
+        b = min(im.height, bbox[3] + 14)
+        im.crop((0, 0, im.width, b)).save(path)
+
+def figure(path, caption, width=6.3):
+    trim_bottom(path)
+    p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p.paragraph_format.space_before = Pt(4); p.paragraph_format.space_after = Pt(2)
+    p.add_run().add_picture(path, width=Inches(width))
+    para(caption, italic=True, size=10, align=WD_ALIGN_PARAGRAPH.CENTER, after=14)
+
+SCR = r'C:\Users\Admin03\Desktop\proekt\mirigrushek\build\_screens'
+figure(SCR + r'\login.png',   'Рисунок 1 — окно входа и регистрации (стартовый экран)')
+figure(SCR + r'\catalog.png', 'Рисунок 2 — каталог: фон #FFDEAD при скидке свыше 17%, '
+       'перечёркнутая основная цена и итоговая цена, голубая подсветка товара, которого нет на складе')
+figure(SCR + r'\orders.png',  'Рисунок 3 — список заказов (роль «Администратор»)')
 
 doc.save(OUT)
 print('saved', OUT)
