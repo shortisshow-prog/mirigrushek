@@ -50,10 +50,10 @@ function layout_header(string $title): void {
         line-height:1.5; -webkit-font-smoothing:antialiased; }
 
   header.top{ position:sticky; top:0; z-index:20; display:flex; align-items:center; gap:14px;
-              padding:14px 32px; background:var(--bg); border-bottom:1px solid var(--line); }
+              padding:14px 32px; background:var(--secondary); border-bottom:1px solid var(--accent); }
   header.top img.logo{ height:40px; width:auto; display:block; }
   header.top h1{ font-size:18px; font-weight:700; letter-spacing:-.01em; margin:0; flex:1; }
-  header.top .who{ font-size:13px; color:var(--muted); background:var(--secondary);
+  header.top .who{ font-size:13px; color:var(--muted); background:#fff;
                    padding:6px 12px; border-radius:999px; white-space:nowrap; }
   header.top .who b{ color:var(--ink); font-weight:700; }
 
@@ -118,7 +118,7 @@ function layout_header(string $title): void {
   </div>
 </header>
 <nav>
-  <a class="btn" href="index.php">Товары</a>
+  <a class="btn" href="index.php?page=catalog">Товары</a>
   <?php if (can_manage()): ?><a class="btn" href="index.php?page=orders">Заказы</a><?php endif; ?>
   <?php if (is_admin()): ?><a class="btn accent" href="index.php?page=product_edit">+ Товар</a><?php endif; ?>
   <span style="flex:1"></span>

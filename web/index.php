@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/common.php';
 
-$page = $_GET['page'] ?? 'catalog';
+$page = $_GET['page'] ?? (current_user() ? 'catalog' : 'login');
 $routes = [
     'login'          => 'pages/login.php',
     'register'       => 'pages/register.php',
@@ -67,7 +67,7 @@ if ($manage): ?>
       </select>
     </label>
     <button class="btn accent" type="submit">Применить</button>
-    <a class="btn" href="index.php">Сбросить</a>
+    <a class="btn" href="index.php?page=catalog">Сбросить</a>
   </form>
 <?php endif; ?>
 
