@@ -191,13 +191,31 @@ vals = ',\n  '.join('(%d, %s)' % (i + 1, q(p)) for i, p in enumerate(points))
 w('INSERT INTO PickupPoints (id, address) VALUES\n  %s;' % vals)
 w('')
 
-# users  (password forced to APP_PASSWORD per instruction)
-w('-- ---------- Пользователи (логины по заданию, пароль = %s) ----------' % APP_PASSWORD)
+# --- транслитерация фамилии -> логин (фамилия латиницей @mail.ru) ---
+TR = {'а':'a','б':'b','в':'v','г':'g','д':'d','е':'e','ё':'e','ж':'zh','з':'z',
+      'и':'i','й':'y','к':'k','л':'l','м':'m','н':'n','о':'o','п':'p','р':'r',
+      'с':'s','т':'t','у':'u','ф':'f','х':'kh','ц':'ts','ч':'ch','ш':'sh',
+      'щ':'shch','ъ':'','ы':'y','ь':'','э':'e','ю':'yu','я':'ya'}
+
+def translit(word):
+    return ''.join(TR.get(ch, TR.get(ch.lower(), ch)) for ch in word.lower())
+
+def make_login(full_name, seen):
+    surname = str(full_name).strip().split()[0]      # фамилия = первое слово ФИО
+    base = translit(surname)
+    seen[base] = seen.get(base, 0) + 1
+    suffix = '' if seen[base] == 1 else str(seen[base])  # совпадающие фамилии -> vorsin, vorsin2
+    return base + suffix + '@mail.ru'
+
+# users  (login = фамилия@mail.ru, password forced to APP_PASSWORD per instruction)
+w('-- ---------- Пользователи (логин = фамилия латиницей @mail.ru, пароль = %s) ----------' % APP_PASSWORD)
 ulines = []
 user_id_by_name = {}
+seen_login = {}
 for i, r in enumerate(users):
-    role, fio, login, _pwd = r[0], r[1], r[2], r[3]
+    role, fio = r[0], r[1]
     uid = i + 1
+    login = make_login(fio, seen_login)
     user_id_by_name.setdefault(str(fio).strip(), uid)  # first match for client lookup
     ulines.append('(%d, %d, %s, %s, %s)' % (uid, ri[str(role).strip()], q(fio), q(login), q(APP_PASSWORD)))
 w('INSERT INTO Users (id, role_id, full_name, login, password) VALUES\n  ' + ',\n  '.join(ulines) + ';')

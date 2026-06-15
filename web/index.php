@@ -5,6 +5,7 @@ require_once __DIR__ . '/common.php';
 $page = $_GET['page'] ?? 'catalog';
 $routes = [
     'login'          => 'pages/login.php',
+    'register'       => 'pages/register.php',
     'logout'         => 'pages/logout.php',
     'orders'         => 'pages/orders.php',
     'product_edit'   => 'pages/product_edit.php',

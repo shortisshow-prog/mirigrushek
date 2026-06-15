@@ -165,18 +165,18 @@ INSERT INTO PickupPoints (id, address) VALUES
   (35, '630201, г. Лесной, ул. Комсомольская, 17'),
   (36, '190949, г. Лесной, ул. Мичурина, 26');
 
--- ---------- Пользователи (логины по заданию, пароль = Xmpl123!) ----------
+-- ---------- Пользователи (логин = фамилия латиницей @mail.ru, пароль = Xmpl123!) ----------
 INSERT INTO Users (id, role_id, full_name, login, password) VALUES
-  (1, 1, 'Ворсин Петр Евгеньевич', '94d5ous@gmail.com', 'Xmpl123!'),
-  (2, 1, 'Старикова Елена Павловна', 'uth4iz@mail.com', 'Xmpl123!'),
-  (3, 1, 'Одинцов Серафим Артёмович', 'yzls62@outlook.com', 'Xmpl123!'),
-  (4, 2, 'Михайлюк Анна Вячеславовна', '1diph5e@tutanota.com', 'Xmpl123!'),
-  (5, 2, 'Ситдикова Елена Анатольевна', 'tjde7c@yahoo.com', 'Xmpl123!'),
-  (6, 2, 'Никифорова Весения Николаевна', 'wpmrc3do@tutanota.com', 'Xmpl123!'),
-  (7, 3, 'Степанов Михаил Артёмович', '5d4zbu@tutanota.com', 'Xmpl123!'),
-  (8, 3, 'Ворсин Петр Евгеньевич', 'ptec8ym@yahoo.com', 'Xmpl123!'),
-  (9, 3, 'Старикова Елена Павловна', '1qz4kw@mail.com', 'Xmpl123!'),
-  (10, 3, 'Сазонов Руслан Германович', '4np6se@mail.com', 'Xmpl123!');
+  (1, 1, 'Ворсин Петр Евгеньевич', 'vorsin@mail.ru', 'Xmpl123!'),
+  (2, 1, 'Старикова Елена Павловна', 'starikova@mail.ru', 'Xmpl123!'),
+  (3, 1, 'Одинцов Серафим Артёмович', 'odintsov@mail.ru', 'Xmpl123!'),
+  (4, 2, 'Михайлюк Анна Вячеславовна', 'mikhaylyuk@mail.ru', 'Xmpl123!'),
+  (5, 2, 'Ситдикова Елена Анатольевна', 'sitdikova@mail.ru', 'Xmpl123!'),
+  (6, 2, 'Никифорова Весения Николаевна', 'nikiforova@mail.ru', 'Xmpl123!'),
+  (7, 3, 'Степанов Михаил Артёмович', 'stepanov@mail.ru', 'Xmpl123!'),
+  (8, 3, 'Ворсин Петр Евгеньевич', 'vorsin2@mail.ru', 'Xmpl123!'),
+  (9, 3, 'Старикова Елена Павловна', 'starikova2@mail.ru', 'Xmpl123!'),
+  (10, 3, 'Сазонов Руслан Германович', 'sazonov@mail.ru', 'Xmpl123!');
 
 -- ---------- Товары ----------
 INSERT INTO Products (article, name, unit_id, price, supplier_id, manufacturer_id, category_id, discount, stock_qty, description, photo) VALUES

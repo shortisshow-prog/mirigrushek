@@ -32,6 +32,7 @@ layout_header('Вход в систему');
       <input type="password" name="password" required>
     </label>
     <button class="btn accent" type="submit">Войти</button>
+    <a class="btn" href="index.php?page=register">Регистрация нового пользователя</a>
     <a class="btn" href="index.php">Войти как гость (только просмотр товаров)</a>
   </form>
 </div>
