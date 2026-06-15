@@ -1,5 +1,4 @@
 <?php
-// Добавление / редактирование заказа (только администратор).
 require_admin();
 
 $id     = isset($_GET['id']) ? (int)$_GET['id'] : 0;
@@ -34,7 +33,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $o['status_id']       = (int)$_POST['status_id'];
     $itemsText            = trim($_POST['items'] ?? '');
 
-    // разбор позиций: каждая строка "АРТИКУЛ КОЛИЧЕСТВО"
     $items = [];
     foreach (preg_split('/\r?\n/', $itemsText) as $line) {
         $line = trim($line);

@@ -1,17 +1,4 @@
 #!/usr/bin/env bash
-# =============================================================================
-#  ООО «МирИгрушек» — развёртывание на чистом Ubuntu (LAMP) одной командой.
-#
-#  Что делает:
-#    1. Ставит Apache + MySQL + PHP.
-#    2. Создаёт БД mirigrushek со всеми таблицами и связями (init.sql).
-#    3. Делает root доступным ОТОВСЮДУ с паролем Xmpl123! (для MySQL Workbench).
-#    4. Разворачивает сайт магазина и убирает приветственную страницу Apache —
-#       по адресу сервера сразу открывается каталог.
-#
-#  Запуск (из папки, где лежит этот скрипт, init.sql и web/):
-#      sudo bash setup.sh
-# =============================================================================
 set -euo pipefail
 
 DB_NAME="mirigrushek"
@@ -43,9 +30,6 @@ fi
 systemctl restart mysql
 
 echo "==> [4/6] Создание базы данных и загрузка данных…"
-# На свежей установке root@localhost ходит через auth_socket -> работает 'mysql' без пароля.
-# init.sql в конце переключает root на пароль Xmpl123!, поэтому пробуем сначала по сокету,
-# при повторном запуске — уже по паролю.
 if mysql -u root -e "SELECT 1" >/dev/null 2>&1; then
   mysql -u root --default-character-set=utf8mb4 < "$HERE/init.sql"
 else
@@ -53,12 +37,11 @@ else
 fi
 
 echo "==> [5/6] Развёртывание сайта в $WEBROOT…"
-rm -f "$WEBROOT/index.html"                 # убираем приветственную страницу Apache
+rm -f "$WEBROOT/index.html"
 mkdir -p "$WEBROOT/images"
 cp -rf "$HERE/web/." "$WEBROOT/"
 [[ -d "$HERE/images" ]] && cp -rf "$HERE/images/." "$WEBROOT/images/"
 chown -R www-data:www-data "$WEBROOT"
-# index.php — первым в очереди индексов
 a2enmod php* >/dev/null 2>&1 || true
 if ! grep -q 'DirectoryIndex index.php' /etc/apache2/mods-enabled/dir.conf 2>/dev/null; then
   sed -i 's/DirectoryIndex .*/DirectoryIndex index.php index.html/' /etc/apache2/mods-enabled/dir.conf || true

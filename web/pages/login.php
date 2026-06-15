@@ -1,5 +1,4 @@
 <?php
-// Окно входа — первое, что видит пользователь (по заданию М1/М2).
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $login = trim($_POST['login'] ?? '');

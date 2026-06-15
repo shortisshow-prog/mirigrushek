@@ -1,11 +1,4 @@
 #!/usr/bin/env bash
-# =============================================================================
-#  Установка ИС «МирИгрушек» на чистый Ubuntu-сервер ОДНОЙ командой:
-#
-#      curl -fsSL https://raw.githubusercontent.com/shortisshow-prog/mirigrushek/main/install.sh | sudo bash
-#
-#  Скрипт клонирует репозиторий и запускает setup.sh (Apache+MySQL+PHP, БД, сайт).
-# =============================================================================
 set -euo pipefail
 
 REPO_URL="https://github.com/shortisshow-prog/mirigrushek.git"

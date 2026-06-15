@@ -1,14 +1,13 @@
--- ====================================================================
---  ООО «МирИгрушек» — БД демонстрационного экзамена 09.02.07-2-2026
---  Сгенерировано автоматически из import/*.xlsx. Кодировка: utf8mb4.
--- ====================================================================
+
+
+
+
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 DROP DATABASE IF EXISTS mirigrushek;
 CREATE DATABASE mirigrushek CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE mirigrushek;
 
--- ---------- Справочники ----------
 CREATE TABLE Roles (
   id   INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(100) NOT NULL UNIQUE
@@ -44,7 +43,6 @@ CREATE TABLE PickupPoints (
   address VARCHAR(255) NOT NULL
 ) ENGINE=InnoDB;
 
--- ---------- Пользователи ----------
 CREATE TABLE Users (
   id        INT AUTO_INCREMENT PRIMARY KEY,
   role_id   INT NOT NULL,
@@ -54,7 +52,6 @@ CREATE TABLE Users (
   CONSTRAINT fk_users_role FOREIGN KEY (role_id) REFERENCES Roles(id)
 ) ENGINE=InnoDB;
 
--- ---------- Товары ----------
 CREATE TABLE Products (
   article         VARCHAR(20) PRIMARY KEY,
   name            VARCHAR(500) NOT NULL,
@@ -73,7 +70,6 @@ CREATE TABLE Products (
   CONSTRAINT fk_prod_cat  FOREIGN KEY (category_id)     REFERENCES Categories(id)
 ) ENGINE=InnoDB;
 
--- ---------- Заказы ----------
 CREATE TABLE Orders (
   id             INT AUTO_INCREMENT PRIMARY KEY,
   order_date     DATE,
@@ -96,7 +92,7 @@ CREATE TABLE OrderItems (
   CONSTRAINT fk_oi_product FOREIGN KEY (product_article) REFERENCES Products(article)
 ) ENGINE=InnoDB;
 
--- ---------- Данные справочников ----------
+
 INSERT INTO Roles (id, name) VALUES
   (1, 'Администратор'),
   (2, 'Менеджер'),
@@ -165,7 +161,7 @@ INSERT INTO PickupPoints (id, address) VALUES
   (35, '630201, г. Лесной, ул. Комсомольская, 17'),
   (36, '190949, г. Лесной, ул. Мичурина, 26');
 
--- ---------- Пользователи (логин = фамилия латиницей @mail.ru, пароль = Xmpl123!) ----------
+
 INSERT INTO Users (id, role_id, full_name, login, password) VALUES
   (1, 1, 'Ворсин Петр Евгеньевич', 'vorsin@mail.ru', 'Xmpl123!'),
   (2, 1, 'Старикова Елена Павловна', 'starikova@mail.ru', 'Xmpl123!'),
@@ -178,7 +174,7 @@ INSERT INTO Users (id, role_id, full_name, login, password) VALUES
   (9, 3, 'Старикова Елена Павловна', 'starikova2@mail.ru', 'Xmpl123!'),
   (10, 3, 'Сазонов Руслан Германович', 'sazonov@mail.ru', 'Xmpl123!');
 
--- ---------- Товары ----------
+
 INSERT INTO Products (article, name, unit_id, price, supplier_id, manufacturer_id, category_id, discount, stock_qty, description, photo) VALUES
   ('PMEZMH', 'Детский игровой набор машинок Щенячий патруль / Dogs mini . 9 героев + 9 инерфионных машинок', 1, 1414, 1, 1, 1, 22, 50, 'Детский набор машинок с героями мультсериала «Щенячий патруль» подойдет как для мальчиков, так и для девочек. В детский набор входит 9 фигурок щенков спасателей.', '1.jpg'),
   ('BPV4MM', 'Конструктор Гарри Поттер Сова Букля 630 деталей совместим с lego harry potter, лего совместимый)', 1, 771, 2, 1, 2, 15, 26, 'Коллекционная модель Букля состоит из множества потрясающих элементов, а также специального механизма внутри. С его помощью можно плавно поднимать-опускать крылья птицы.', '2.jpg'),
@@ -191,7 +187,7 @@ INSERT INTO Products (article, name, unit_id, price, supplier_id, manufacturer_i
   ('MIO8YV', 'Музыкальная игрушка интерактивная Пульт, детский прорезыватель для малышей', 1, 305, 5, 2, 3, 9, 31, 'Музыкальная игрушка интерактивная Пульт, детский прорезыватель для малышей', '9.jpg'),
   ('UER2QD', 'Большой набор опытов и экспериментов для детей 14 в 1', 1, 2506, 5, 2, 1, 8, 27, 'Большой набор опытов и экспериментов для детей 14 в 1', '10.jpg');
 
--- ---------- Заказы и состав заказов ----------
+
 INSERT INTO Orders (id, order_date, delivery_date, pickup_point_id, client_user_id, receive_code, status_id) VALUES
   (1, '2025-02-27', '2025-04-20', 1, 7, '901', 1),
   (2, '2024-09-28', '2025-04-21', 11, 8, '902', 1),
@@ -228,9 +224,6 @@ INSERT INTO OrderItems (order_id, product_article, quantity) VALUES
 
 SET FOREIGN_KEY_CHECKS = 1;
 
--- ====================================================================
---  Пользователь root: доступ отовсюду, все привилегии (для Workbench)
--- ====================================================================
 ALTER USER 'root'@'localhost' IDENTIFIED WITH caching_sha2_password BY 'Xmpl123!';
 CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED WITH caching_sha2_password BY 'Xmpl123!';
 ALTER USER 'root'@'%' IDENTIFIED WITH caching_sha2_password BY 'Xmpl123!';

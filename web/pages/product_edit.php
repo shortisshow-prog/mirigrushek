@@ -1,5 +1,4 @@
 <?php
-// Добавление / редактирование товара (только администратор).
 require_admin();
 
 $article = $_GET['article'] ?? '';
@@ -11,7 +10,6 @@ $sups  = db()->query('SELECT id,name FROM Suppliers ORDER BY name')->fetchAll();
 $mans  = db()->query('SELECT id,name FROM Manufacturers ORDER BY name')->fetchAll();
 $units = db()->query('SELECT id,name FROM Units ORDER BY name')->fetchAll();
 
-// текущие данные
 if ($isEdit) {
     $st = db()->prepare('SELECT * FROM Products WHERE article = ?');
     $st->execute([$article]);
@@ -39,7 +37,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($p['stock_qty'] < 0)               $errors[] = 'Количество не может быть отрицательным.';
     if ($p['discount'] < 0)                $errors[] = 'Скидка не может быть отрицательной.';
 
-    // загрузка фото (минимум 300×200 px)
     $photoName = $p['photo'];
     if (!empty($_FILES['photo']['tmp_name'])) {
         $info = @getimagesize($_FILES['photo']['tmp_name']);
@@ -63,7 +60,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $st->execute([$p['name'],$p['unit_id'],$p['price'],$p['supplier_id'],$p['manufacturer_id'],
                           $p['category_id'],$p['discount'],$p['stock_qty'],$p['description'],$photoName,$article]);
         } else {
-            // Артикул нового товара генерируется автоматически и не отображается при добавлении
             do {
                 $newArticle = strtoupper(bin2hex(random_bytes(3)));
                 $chk = db()->prepare('SELECT 1 FROM Products WHERE article=?'); $chk->execute([$newArticle]);

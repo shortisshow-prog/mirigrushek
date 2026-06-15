@@ -75,6 +75,8 @@ ri, ci, si, mi, ui, sti = idx(roles), idx(categories), idx(suppliers), idx(manuf
 
 L = []
 def w(s=''):
+    s = str(s)
+    s = '\n'.join(ln for ln in s.split('\n') if not ln.lstrip().startswith('--'))
     L.append(s)
 
 w('-- ====================================================================')

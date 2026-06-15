@@ -1,5 +1,4 @@
 <?php
-// Подключение к БД. Сайт ходит под root (по требованию — root «для всего»).
 declare(strict_types=1);
 
 const DB_HOST = '127.0.0.1';

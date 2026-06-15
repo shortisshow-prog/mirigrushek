@@ -1,5 +1,4 @@
 <?php
-// Регистрация нового пользователя (гость -> Авторизированный клиент).
 $errors = [];
 $fio = trim($_POST['full_name'] ?? '');
 $login = trim($_POST['login'] ?? '');
@@ -29,7 +28,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $ins = db()->prepare('INSERT INTO Users (role_id, full_name, login, password) VALUES (?,?,?,?)');
         $ins->execute([$roleId, $fio, $login, $pass]);
 
-        // сразу авторизуем нового пользователя
         $_SESSION['user'] = [
             'id'        => (int)db()->lastInsertId(),
             'full_name' => $fio,

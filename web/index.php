@@ -1,5 +1,4 @@
 <?php
-// Точка входа. Apache отдаёт её сразу (без приветственной страницы).
 require_once __DIR__ . '/common.php';
 
 $page = $_GET['page'] ?? 'catalog';
@@ -15,9 +14,6 @@ $routes = [
 ];
 if (isset($routes[$page])) { require __DIR__ . '/' . $routes[$page]; return; }
 
-// -------------------- Каталог товаров --------------------
-// Гость и авторизированный клиент — без фильтрации/сортировки/поиска.
-// Менеджер и администратор — с фильтром (категория), сортировкой (цена) и поиском (наименование).
 $manage = can_manage();
 
 $where = [];
@@ -77,8 +73,8 @@ if ($manage): ?>
 
 <div class="grid">
   <?php foreach ($products as $p):
-      $sale     = (int)$p['discount'] > 17;          // скидка > 17% -> фон #FFDEAD
-      $outStock = (int)$p['stock_qty'] === 0;        // нет на складе -> цена красная
+      $sale     = (int)$p['discount'] > 17;
+      $outStock = (int)$p['stock_qty'] === 0;
   ?>
     <div class="card <?= $sale ? 'sale' : '' ?>">
       <img class="photo" src="<?= e(photo_src($p['photo'])) ?>" alt="<?= e($p['name']) ?>">
