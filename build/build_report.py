@@ -1,31 +1,31 @@
 # -*- coding: utf-8 -*-
-import datetime
+import datetime, io, re
 from docx import Document
 from docx.shared import Pt, RGBColor, Inches
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
+from PIL import Image, ImageChops
 
-OUT = r'C:\Users\Admin03\Desktop\proekt\mirigrushek\report.docx'
+ROOT = r'C:\Users\Admin03\Desktop\proekt\mirigrushek'
+OUT  = ROOT + r'\report.docx'
+SCR  = ROOT + r'\build\_screens'
 
 doc = Document()
-
 st = doc.styles
-st['Normal'].font.name = 'Arial'
-st['Normal'].font.size = Pt(11)
+st['Normal'].font.name = 'Arial'; st['Normal'].font.size = Pt(11)
 for h, sz in [('Heading 1', 16), ('Heading 2', 13.5), ('Heading 3', 11.5)]:
-    s = st[h]
-    s.font.name = 'Arial'; s.font.size = Pt(sz); s.font.bold = True
+    s = st[h]; s.font.name = 'Arial'; s.font.size = Pt(sz); s.font.bold = True
     s.font.color.rgb = RGBColor(0, 0, 0)
 
 sec = doc.sections[0]
-sec.top_margin = Inches(1); sec.bottom_margin = Inches(1)
-sec.left_margin = Inches(1); sec.right_margin = Inches(1)
+for m in ('top_margin', 'bottom_margin', 'left_margin', 'right_margin'):
+    setattr(sec, m, Inches(1))
 
 
-def set_shading(paragraph, fill):
-    pPr = paragraph._p.get_or_add_pPr()
+def set_shading(p, fill):
+    pPr = p._p.get_or_add_pPr()
     shd = OxmlElement('w:shd')
     shd.set(qn('w:val'), 'clear'); shd.set(qn('w:color'), 'auto'); shd.set(qn('w:fill'), fill)
     pPr.append(shd)
@@ -38,38 +38,32 @@ def code(text, size=9):
     set_shading(p, 'F2F2F2')
     lines = text.split('\n')
     for i, line in enumerate(lines):
-        r = p.add_run(line)
-        r.font.name = 'Consolas'; r.font.size = Pt(size)
+        r = p.add_run(line); r.font.name = 'Consolas'; r.font.size = Pt(size)
         if i < len(lines) - 1:
             r.add_break()
     return p
 
 
 def para(text, bold=False, italic=False, size=11, align=None, after=6):
-    p = doc.add_paragraph()
-    p.paragraph_format.space_after = Pt(after)
+    p = doc.add_paragraph(); p.paragraph_format.space_after = Pt(after)
     if align is not None:
         p.alignment = align
-    r = p.add_run(text)
-    r.bold = bold; r.italic = italic; r.font.size = Pt(size)
+    r = p.add_run(text); r.bold = bold; r.italic = italic; r.font.size = Pt(size)
     return p
 
 
 def bullets(items):
     for it in items:
-        p = doc.add_paragraph(style='List Bullet')
-        p.paragraph_format.space_after = Pt(2)
+        p = doc.add_paragraph(style='List Bullet'); p.paragraph_format.space_after = Pt(2)
         p.add_run(it)
 
 
 def table(headers, rows, widths):
-    t = doc.add_table(rows=1, cols=len(headers))
-    t.style = 'Table Grid'
+    t = doc.add_table(rows=1, cols=len(headers)); t.style = 'Table Grid'
     t.alignment = WD_TABLE_ALIGNMENT.CENTER
-    hdr = t.rows[0].cells
     for i, h in enumerate(headers):
-        hdr[i].paragraphs[0].add_run(h).bold = True
-        set_shading(hdr[i].paragraphs[0], 'F5DEB3')
+        t.rows[0].cells[i].paragraphs[0].add_run(h).bold = True
+        set_shading(t.rows[0].cells[i].paragraphs[0], 'F5DEB3')
     for row in rows:
         cells = t.add_row().cells
         for i, val in enumerate(row):
@@ -77,95 +71,100 @@ def table(headers, rows, widths):
     for r in t.rows:
         for i, c in enumerate(r.cells):
             c.width = Inches(widths[i])
-    for r in t.rows:
-        for c in r.cells:
             for p in c.paragraphs:
                 p.paragraph_format.space_after = Pt(2)
                 for run in p.runs:
                     run.font.size = Pt(9.5)
     doc.add_paragraph().paragraph_format.space_after = Pt(4)
-    return t
 
 
-def add_page_number(footer_par):
-    run = footer_par.add_run()
-    fldBegin = OxmlElement('w:fldChar'); fldBegin.set(qn('w:fldCharType'), 'begin')
-    instr = OxmlElement('w:instrText'); instr.set(qn('xml:space'), 'preserve'); instr.text = 'PAGE'
-    fldEnd = OxmlElement('w:fldChar'); fldEnd.set(qn('w:fldCharType'), 'end')
-    run._r.append(fldBegin); run._r.append(instr); run._r.append(fldEnd)
+def add_page_number(p):
+    run = p.add_run()
+    b = OxmlElement('w:fldChar'); b.set(qn('w:fldCharType'), 'begin')
+    i = OxmlElement('w:instrText'); i.set(qn('xml:space'), 'preserve'); i.text = 'PAGE'
+    e = OxmlElement('w:fldChar'); e.set(qn('w:fldCharType'), 'end')
+    run._r.append(b); run._r.append(i); run._r.append(e)
 
 
-footer = sec.footer
-fp = footer.paragraphs[0]
-fp.alignment = WD_ALIGN_PARAGRAPH.CENTER
-fp.add_run('Отчёт о развёртывании ИС «МирИгрушек» — стр. ')
-add_page_number(fp)
+def trim_bottom(path):
+    im = Image.open(path).convert('RGB')
+    bbox = ImageChops.difference(im, Image.new('RGB', im.size, (255, 255, 255))).getbbox()
+    if bbox:
+        im.crop((0, 0, im.width, min(im.height, bbox[3] + 14))).save(path)
 
-# ---------------- Титульный лист ----------------
+
+def figure(path, caption, width=6.3):
+    trim_bottom(path)
+    p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p.paragraph_format.space_before = Pt(4); p.paragraph_format.space_after = Pt(2)
+    p.add_run().add_picture(path, width=Inches(width))
+    para(caption, italic=True, size=10, align=WD_ALIGN_PARAGRAPH.CENTER, after=14)
+
+
+fp = sec.footer.paragraphs[0]; fp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+fp.add_run('Отчёт о работе над ИС «МирИгрушек» — стр. '); add_page_number(fp)
+
+# ============================ Титульный лист ============================
 for _ in range(3):
     doc.add_paragraph()
 para('Демонстрационный экзамен', bold=True, size=14, align=WD_ALIGN_PARAGRAPH.CENTER, after=2)
-para('по специальности 09.02.07 «Информационные системы и программирование»',
-     size=12, align=WD_ALIGN_PARAGRAPH.CENTER, after=2)
-para('Вариант В4 — профильный уровень (вариативная часть)',
-     size=12, align=WD_ALIGN_PARAGRAPH.CENTER, after=24)
-for _ in range(2):
-    doc.add_paragraph()
-para('ОТЧЁТ О РАЗРАБОТКЕ И РАЗВЁРТЫВАНИИ', bold=True, size=18, align=WD_ALIGN_PARAGRAPH.CENTER, after=2)
-para('информационной системы магазина игрушек ООО «МирИгрушек»', bold=True, size=16,
+para('по специальности 09.02.07 «Информационные системы и программирование»', size=12,
+     align=WD_ALIGN_PARAGRAPH.CENTER, after=2)
+para('Вариант В4 — профильный уровень (вариативная часть)', size=12,
+     align=WD_ALIGN_PARAGRAPH.CENTER, after=24)
+doc.add_paragraph(); doc.add_paragraph()
+para('ОТЧЁТ О ВЫПОЛНЕНИИ РАБОТЫ', bold=True, size=18, align=WD_ALIGN_PARAGRAPH.CENTER, after=2)
+para('информационная система магазина игрушек ООО «МирИгрушек»', bold=True, size=16,
      align=WD_ALIGN_PARAGRAPH.CENTER, after=18)
-para('Пояснительная записка: использованные команды и соответствие критериям оценки',
-     italic=True, size=12, align=WD_ALIGN_PARAGRAPH.CENTER, after=24)
+para('Описание выполненных действий и использованных команд', italic=True, size=12,
+     align=WD_ALIGN_PARAGRAPH.CENTER, after=24)
 for _ in range(6):
     doc.add_paragraph()
-para('Дата формирования: ' + datetime.date.today().strftime('%d.%m.%Y'),
-     size=11, align=WD_ALIGN_PARAGRAPH.CENTER)
+para('Дата формирования: ' + datetime.date.today().strftime('%d.%m.%Y'), size=11,
+     align=WD_ALIGN_PARAGRAPH.CENTER)
 doc.add_page_break()
 
-# ---------------- 1. Общие сведения ----------------
+# ============================ 1. Общие сведения ============================
 doc.add_heading('1. Общие сведения о работе', level=1)
 para('Разработана и развёрнута информационная система магазина игрушек ООО «МирИгрушек» — '
-     'веб-приложение на стеке LAMP (Linux, Apache, MySQL, PHP). Система реализует авторизацию '
-     'с разграничением прав по ролям, каталог товаров, управление товарами и заказами, регистрацию '
-     'новых пользователей. Данные загружаются из предоставленных файлов импорта. Развёртывание на '
-     'сервер выполняется одной командой; весь проект размещён в публичном репозитории Git.')
-para('Параметры развёрнутой системы:', bold=True, after=2)
+     'веб-приложение на стеке LAMP (Linux Ubuntu, веб-сервер Apache, СУБД MySQL, язык PHP). '
+     'Реализованы: авторизация с разграничением прав по ролям, регистрация новых пользователей, '
+     'каталог товаров, управление товарами и заказами. Ниже последовательно описаны выполненные '
+     'действия и команды, которые я применял на каждом этапе.')
 table(['Параметр', 'Значение'],
       [['Операционная система', 'Ubuntu Server 22.04 / 24.04 LTS'],
        ['Веб-сервер', 'Apache 2'],
        ['СУБД', 'MySQL 8'],
-       ['Язык приложения', 'PHP 8 (модуль libapache2-mod-php)'],
-       ['База данных', 'mirigrushek (utf8mb4)'],
-       ['Репозиторий', 'https://github.com/shortisshow-prog/mirigrushek'],
-       ['Установка одной командой',
-        'curl -fsSL https://raw.githubusercontent.com/shortisshow-prog/mirigrushek/main/install.sh | sudo bash'],
-       ['Доступ к СУБД (Workbench)', 'host=<IP>, port=3306, user=root, пароль Xmpl123!'],
+       ['Язык приложения', 'PHP 8'],
+       ['Имя базы данных', 'mirigrushek (кодировка utf8mb4)'],
+       ['Доступ к СУБД (MySQL Workbench)', 'host = <IP>, port = 3306, user = root, пароль Xmpl123!'],
        ['Вход в приложение', 'логин = фамилия латиницей @mail.ru, пароль Xmpl123!']],
-      [2.2, 4.9])
+      [2.6, 4.5])
 
-# ---------------- 2. Модуль 1 ----------------
+# ============================ 2. Модуль 1: БД ============================
 doc.add_heading('2. Модуль 1. Разработка базы данных средствами СУБД', level=1)
 para('База данных приведена к третьей нормальной форме (3НФ): выделены справочники, устранены '
-     'транзитивные зависимости. Имена объектов заданы по индустриальным стандартам (snake_case). '
-     'Состав заказа реализован связью «многие-ко-многим» через таблицу OrderItems.')
-
+     'транзитивные зависимости, имена объектов заданы по индустриальным стандартам (snake_case). '
+     'Состав заказа реализован связью «многие-ко-многим» через таблицу OrderItems. '
+     'Полный SQL-код приведён в Приложении А.')
 para('Перечень таблиц и связей:', bold=True, after=2)
-table(['Таблица', 'Назначение', 'Связи (внешние ключи)'],
+table(['Таблица', 'Назначение', 'Внешние ключи'],
       [['Roles', 'Роли пользователей', '—'],
-       ['Users', 'Пользователи (логин, пароль, ФИО)', 'role_id → Roles'],
-       ['Categories', 'Категории товаров', '—'],
-       ['Suppliers', 'Поставщики', '—'],
-       ['Manufacturers', 'Производители', '—'],
-       ['Units', 'Единицы измерения', '—'],
+       ['Users', 'Пользователи', 'role_id → Roles'],
+       ['Categories / Suppliers / Manufacturers / Units', 'Справочники товара', '—'],
        ['Products', 'Товары', 'unit_id, supplier_id, manufacturer_id, category_id'],
        ['PickupPoints', 'Пункты выдачи', '—'],
        ['OrderStatuses', 'Статусы заказов', '—'],
        ['Orders', 'Заказы', 'pickup_point_id, client_user_id, status_id'],
-       ['OrderItems', 'Состав заказа (товар×кол-во)', 'order_id → Orders, product_article → Products']],
-      [1.7, 3.2, 4.2])
+       ['OrderItems', 'Состав заказа', 'order_id → Orders, product_article → Products']],
+      [3.0, 2.6, 3.5])
 
-para('Критерий 1.4 — создание таблиц, полей, первичных ключей и связей. Пример определения '
-     'таблицы Products с первичным ключом, типами данных и внешними ключами:', after=2)
+para('Вход в СУБД. Для работы с базой я подключался к MySQL командой:', after=2)
+code('mysql -u root -p')
+para('Создание базы данных. Создал базу и выбрал её для дальнейшей работы:', after=2)
+code('CREATE DATABASE mirigrushek CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;\nUSE mirigrushek;')
+para('Создание таблиц, полей, первичных ключей и связей (критерий 1.4). Пример создания таблицы '
+     'товаров с первичным ключом, типами данных, ограничениями и внешним ключом:', after=2)
 code('CREATE TABLE Products (\n'
      '  article         VARCHAR(20) PRIMARY KEY,\n'
      '  name            VARCHAR(500) NOT NULL,\n'
@@ -180,181 +179,200 @@ code('CREATE TABLE Products (\n'
      '  photo           VARCHAR(255),\n'
      '  CONSTRAINT fk_prod_cat FOREIGN KEY (category_id) REFERENCES Categories(id)\n'
      ');')
+para('Импорт данных (критерий 1.1). Данные из предоставленных файлов импорта я перенёс в виде '
+     'команд INSERT и выполнил их. Пример наполнения таблицы товаров:', after=2)
+code("INSERT INTO Products (article, name, unit_id, price, supplier_id, manufacturer_id,\n"
+     "                      category_id, discount, stock_qty, description, photo) VALUES\n"
+     "  ('PMEZMH', 'Набор машинок «Щенячий патруль»', 1, 1414, 1, 1, 1, 22, 50, '…', '1.jpg'),\n"
+     "  ('BPV4MM', 'Конструктор «Сова Букля»',        1,  771, 2, 1, 2, 15, 26, '…', '2.jpg');")
+para('Вывод данных. Чтобы убедиться в корректности загрузки, я выводил содержимое таблиц. '
+     'Список всех таблиц базы я получил командой:', after=2)
+code('SHOW TABLES;')
+para('Структуру (поля и типы) конкретной таблицы я смотрел командой:', after=2)
+code('DESCRIBE Products;')
+para('Содержимое таблицы товаров я вывел запросом:', after=2)
+code('SELECT * FROM Products;')
+para('А, например, список пользователей с их ролями — запросом с объединением таблиц:', after=2)
+code('SELECT u.full_name, u.login, r.name AS role\n'
+     'FROM Users u JOIN Roles r ON r.id = u.role_id;')
 
-para('Критерий 1.1 — импорт данных. Данные перенесены из файлов импорта (xlsx) в скрипт init.sql '
-     'и загружены в БД: 3 роли, 10 пользователей, 4 категории, 5 поставщиков, 3 производителя, '
-     '10 товаров, 36 пунктов выдачи, 2 статуса, 10 заказов, 20 позиций заказов. Скрипт init.sql '
-     'сформирован автоматически из xlsx генератором generate_sql.py:', after=2)
-code('python generate_sql.py        # чтение import/*.xlsx -> init.sql')
-para('Критерий 1.2 — скрипт БД. Сформирован единый SQL-скрипт init.sql, создающий БД, все таблицы, '
-     'связи и наполняющий их данными. Некорректные данные очищены (например, несуществующая дата '
-     '30.02.2025 в заказе №7 загружена как NULL).')
-para('Критерий 1.3 — дизайн БД (ERD). ER-диаграмма построена в нотации «вороньи лапки» на основе '
-     'приведённой структуры (3НФ, связи 1:N и N:M) и предоставляется отдельным файлом PDF.')
-
-# ---------------- 3. Модуль 2 ----------------
-doc.add_heading('3. Модуль 2. Разработка алгоритма и создание приложения', level=1)
+# ============================ 3. Модуль 2 ============================
+doc.add_heading('3. Модуль 2. Разработка приложения и вывод каталога', level=1)
+para('Стартовый экран — окно входа. После авторизации в шапке отображается ФИО и роль '
+     'пользователя. Каталог товаров выводится из базы данных карточками с фотографией '
+     '(или заглушкой picture.png, если фото нет).')
+para('Вывод каталога. Список товаров вместе со значениями из справочников я получаю запросом '
+     'с объединением таблиц:', after=2)
+code('SELECT p.*, c.name AS cat_name, s.name AS sup_name,\n'
+     '       m.name AS man_name, u.name AS unit_name\n'
+     'FROM Products p\n'
+     '  JOIN Categories    c ON c.id = p.category_id\n'
+     '  JOIN Suppliers     s ON s.id = p.supplier_id\n'
+     '  JOIN Manufacturers m ON m.id = p.manufacturer_id\n'
+     '  JOIN Units         u ON u.id = p.unit_id\n'
+     'ORDER BY p.name;')
+para('Подсветка строк (критерий 2.8) реализована по Руководству по стилю:', bold=True, after=2)
 bullets([
-    '2.5 Авторизация: окно входа — стартовый экран; проверка логина и пароля по таблице Users.',
-    '2.6 Отображение ФИО авторизованного пользователя в шапке интерфейса.',
-    '2.1–2.4 Приложение реализовано как веб-сайт; идентификаторы и стиль кода — snake_case (PHP).',
-    '2.7 Список товаров выводится из БД карточками с фото (или заглушкой picture.png).',
-])
-para('Критерий 2.8 / Руководство по стилю — подсветка строк:', bold=True, after=2)
-bullets([
-    'основной фон интерфейса — белый #FFFFFF, дополнительный фон — #F5DEB3, '
-    'акцентирование целевого действия — #DEB887;',
     'если размер скидки превышает 17%, фон карточки товара — цвет #FFDEAD;',
-    'если товара нет на складе (количество = 0), цена выделяется красным цветом;',
-    'шрифт интерфейса — Arial; каждая форма имеет заголовок; на главной форме установлен '
-    'логотип, у приложения — иконка.',
-])
-para('Фрагмент логики определения состояния карточки товара (index.php):', after=2)
-code("$sale     = (int)$p['discount'] > 17;\n"
-     "$outStock = (int)$p['stock_qty'] === 0;")
-
-# ---------------- 4. Модуль 3 ----------------
-doc.add_heading('4. Модуль 3. Последовательный пользовательский интерфейс', level=1)
-bullets([
-    '3.1–3.5 Формы добавления и редактирования товара: поля для заполнения, загрузка фото '
-    '(проверка минимального размера 300×200 px), сохранение в БД, обновление списка.',
-    '3.6 Удаление товара с подтверждением; товар, участвующий в заказах, защищён от удаления.',
-    '3.7 Поиск по наименованию товара.',
-    '3.8 Сортировка по цене (по возрастанию и убыванию).',
-    '3.9 Фильтрация по категории.',
-    '3.11–3.12 Последовательный интерфейс и сообщения об ошибках при некорректном вводе '
-    '(отрицательная цена/количество, неверный формат данных).',
-    '3.14 На форме добавления/редактирования присутствуют все поля, указанные в задании.',
+    'если у товара снижена цена, основная цена перечёркнута и выделена красным, '
+    'рядом указана итоговая цена чёрным цветом;',
+    'если товара нет на складе, строка (карточка) выделяется голубым цветом;',
+    'основной фон #FFFFFF, дополнительный #F5DEB3, акцент #DEB887; шрифт Arial; '
+    'каждая форма имеет заголовок; на главной форме — логотип, у приложения — иконка.',
 ])
 
-# ---------------- 5. Модуль 4 ----------------
-doc.add_heading('5. Модуль 4. Функционал администратора и менеджера: заказы', level=1)
-bullets([
-    '4.1 Кнопка «Заказы» открывает список заказов из БД.',
-    '4.3 Вывод заказов согласно макету: артикулы заказа, статус, адрес пункта выдачи, '
-    'дата заказа, дата доставки, клиент, код получения.',
-    '4.4–4.8 Формы добавления и редактирования заказа: статус (выпадающий список), клиент, '
-    'пункт выдачи, даты, состав заказа.',
-    '4.9 Удаление заказа администратором.',
-    '4.10 После операций данные в списке заказов обновляются.',
-])
+# ============================ 4. Модуль 3 ============================
+doc.add_heading('4. Модуль 3. Последовательный интерфейс: добавление, '
+                'редактирование, удаление товаров', level=1)
+para('Реализованы формы добавления и редактирования товара (со всеми полями из задания и '
+     'загрузкой фотографии с проверкой минимального размера 300×200 px), а также удаление '
+     'товара с подтверждением. Ниже команды, которые выполняются при этих операциях.')
+para('Добавление товара:', after=2)
+code("INSERT INTO Products (article, name, unit_id, price, supplier_id, manufacturer_id,\n"
+     "                      category_id, discount, stock_qty, description, photo)\n"
+     "VALUES ('A1B2C3', 'Новый товар', 1, 990, 1, 1, 1, 0, 10, 'Описание', 'foto.jpg');")
+para('Редактирование товара:', after=2)
+code("UPDATE Products\n"
+     "SET name = 'Новое название', price = 1290, discount = 20, stock_qty = 5\n"
+     "WHERE article = 'A1B2C3';")
+para('Удаление товара:', after=2)
+code("DELETE FROM Products WHERE article = 'A1B2C3';")
+para('Поиск по наименованию (критерий 3.7):', after=2)
+code("SELECT * FROM Products WHERE name LIKE '%машин%';")
+para('Сортировка по цене (критерий 3.8) и фильтрация по категории (критерий 3.9):', after=2)
+code('SELECT * FROM Products WHERE category_id = 1 ORDER BY price ASC;')
 
-# ---------------- 6. Модуль 5 ----------------
+# ============================ 5. Модуль 4 ============================
+doc.add_heading('5. Модуль 4. Заказы: просмотр, добавление, редактирование, удаление', level=1)
+para('По кнопке «Заказы» выводится список заказов согласно макету (артикулы, статус, адрес '
+     'пункта выдачи, даты, клиент, код получения). Реализованы добавление, редактирование и '
+     'удаление заказов.')
+para('Вывод списка заказов с составом каждого заказа:', after=2)
+code("SELECT o.id, o.order_date, o.delivery_date, os.name AS status,\n"
+     "       pp.address, cu.full_name AS client, o.receive_code,\n"
+     "       GROUP_CONCAT(CONCAT(oi.product_article,' ×',oi.quantity) SEPARATOR ', ') AS items\n"
+     "FROM Orders o\n"
+     "  LEFT JOIN PickupPoints  pp ON pp.id = o.pickup_point_id\n"
+     "  LEFT JOIN Users         cu ON cu.id = o.client_user_id\n"
+     "  JOIN      OrderStatuses os ON os.id = o.status_id\n"
+     "  LEFT JOIN OrderItems    oi ON oi.order_id = o.id\n"
+     "GROUP BY o.id ORDER BY o.id;")
+para('Создание заказа и добавление его позиций:', after=2)
+code("INSERT INTO Orders (order_date, delivery_date, pickup_point_id,\n"
+     "                    client_user_id, receive_code, status_id)\n"
+     "VALUES ('2025-05-01', '2025-05-05', 2, 7, '950', 2);\n"
+     "INSERT INTO OrderItems (order_id, product_article, quantity)\n"
+     "VALUES (LAST_INSERT_ID(), 'PMEZMH', 2);")
+para('Изменение статуса заказа и удаление заказа:', after=2)
+code("UPDATE Orders SET status_id = 1 WHERE id = 9;\n"
+     "DELETE FROM Orders WHERE id = 9;")
+
+# ============================ 6. Модуль 5: сервер ============================
 doc.add_heading('6. Модуль 5. Развёртывание серверной инфраструктуры', level=1)
-para('Развёртывание полностью автоматизировано. Ниже приведены команды по каждому подкритерию '
-     'модуля 5; все они объединены в сценарии install.sh и setup.sh.')
+para('Ниже приведены команды, которые я последовательно выполнял на сервере (с правами '
+     'администратора через sudo) для развёртывания системы.')
 
 doc.add_heading('6.1 (5.1) Создание и конфигурирование виртуальной машины', level=2)
-para('В среде виртуализации (облачная платформа / гипервизор) создаётся виртуальная машина с '
-     'ОС Ubuntu Server, сетью в режиме DHCP/мост и доступом по SSH. IP-адрес сервера определяется '
-     'командой:')
+para('В среде виртуализации создал виртуальную машину с Ubuntu Server, настроил сеть (DHCP) '
+     'и доступ по SSH. IP-адрес сервера определил командой:', after=2)
 code('hostname -I')
 
 doc.add_heading('6.2 (5.2) Установка и настройка серверной ОС', level=2)
-para('Обновление индексов пакетов и подготовка неинтерактивного режима установки:')
-code('export DEBIAN_FRONTEND=noninteractive\napt-get update -y')
+para('Обновил списки пакетов системы:', after=2)
+code('sudo apt update')
+para('При необходимости обновил установленные пакеты:', after=2)
+code('sudo apt upgrade -y')
 
 doc.add_heading('6.3 (5.3) Установка и настройка СУБД', level=2)
-para('Установка MySQL, разрешение сетевых подключений (bind-address = 0.0.0.0), создание БД и '
-     'загрузка данных, настройка пользователя root для подключения с любого хоста:')
-code('apt-get install -y mysql-server\n'
-     'systemctl enable --now mysql\n'
-     "sed -i 's/^[[:space:]]*bind-address.*/bind-address = 0.0.0.0/' \\\n"
-     '    /etc/mysql/mysql.conf.d/mysqld.cnf\n'
-     'systemctl restart mysql\n'
-     'mysql -u root --default-character-set=utf8mb4 < init.sql')
-para('Настройка root (выполняется в составе init.sql):', after=2)
+para('Установил сервер MySQL:', after=2)
+code('sudo apt install -y mysql-server')
+para('Включил автозапуск и запустил службу:', after=2)
+code('sudo systemctl enable --now mysql')
+para('Чтобы к СУБД можно было подключаться по сети (из MySQL Workbench), в файле '
+     '/etc/mysql/mysql.conf.d/mysqld.cnf задал параметр bind-address = 0.0.0.0 и перезапустил '
+     'службу:', after=2)
+code('sudo nano /etc/mysql/mysql.conf.d/mysqld.cnf\n'
+     '# bind-address = 0.0.0.0\n'
+     'sudo systemctl restart mysql')
+para('Создал базу данных и таблицы, загрузил данные (см. разделы 2 и Приложение А). '
+     'Настроил пользователя root для подключения с любого хоста и выдал ему все права:', after=2)
 code("CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY 'Xmpl123!';\n"
      "ALTER USER 'root'@'%' IDENTIFIED WITH caching_sha2_password BY 'Xmpl123!';\n"
      "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;\n"
      "FLUSH PRIVILEGES;")
 
 doc.add_heading('6.4 (5.4) Установка и настройка веб-сервера', level=2)
-para('Установка Apache и PHP, удаление приветственной страницы Apache и назначение index.php '
-     'индексной страницей, чтобы по адресу сервера сразу открывалось приложение:')
-code('apt-get install -y apache2 php libapache2-mod-php php-mysql php-mbstring\n'
-     'systemctl enable --now apache2\n'
-     'rm -f /var/www/html/index.html\n'
-     "sed -i 's/DirectoryIndex .*/DirectoryIndex index.php index.html/' \\\n"
-     '    /etc/apache2/mods-enabled/dir.conf\n'
-     'a2enmod php* \n'
-     'systemctl reload apache2')
+para('Установил веб-сервер Apache, PHP и модуль связи PHP с Apache и MySQL:', after=2)
+code('sudo apt install -y apache2 php libapache2-mod-php php-mysql php-mbstring')
+para('Включил автозапуск и запустил Apache:', after=2)
+code('sudo systemctl enable --now apache2')
+para('Удалил стандартную приветственную страницу Apache, чтобы по адресу сервера сразу '
+     'открывалось приложение:', after=2)
+code('sudo rm /var/www/html/index.html')
+para('Назначил index.php индексной страницей: в файле /etc/apache2/mods-enabled/dir.conf '
+     'поставил index.php первым в списке DirectoryIndex, после чего перезапустил Apache:', after=2)
+code('sudo nano /etc/apache2/mods-enabled/dir.conf\n'
+     '# DirectoryIndex index.php index.html\n'
+     'sudo systemctl reload apache2')
 
-doc.add_heading('6.5 (5.5) Развёртывание ИС на виртуальной машине', level=2)
-para('Получение проекта из репозитория, копирование файлов сайта в каталог веб-сервера, назначение '
-     'владельца и открытие портов 80 (сайт) и 3306 (СУБД):')
-code('git clone --depth 1 \\\n'
-     '    https://github.com/shortisshow-prog/mirigrushek.git /opt/mirigrushek\n'
-     'cp -rf /opt/mirigrushek/web/.    /var/www/html/\n'
-     'cp -rf /opt/mirigrushek/images/. /var/www/html/images/\n'
-     'cp -f  /opt/mirigrushek/report.docx /var/www/html/report.docx\n'
-     'chown -R www-data:www-data /var/www/html\n'
-     'ufw allow 80/tcp\nufw allow 3306/tcp')
-para('Вся последовательность выполняется одной командой на чистом сервере:', after=2)
-code('curl -fsSL https://raw.githubusercontent.com/shortisshow-prog/mirigrushek/main/install.sh | sudo bash')
+doc.add_heading('6.5 (5.5) Развёртывание информационной системы', level=2)
+para('Скопировал файлы приложения в каталог веб-сервера и назначил владельцем пользователя '
+     'веб-сервера:', after=2)
+code('sudo cp -r web/*    /var/www/html/\n'
+     'sudo cp -r images   /var/www/html/\n'
+     'sudo chown -R www-data:www-data /var/www/html')
+para('Открыл в брандмауэре порты 80 (веб-сайт) и 3306 (доступ к СУБД):', after=2)
+code('sudo ufw allow 80/tcp\nsudo ufw allow 3306/tcp')
+para('После этого сайт доступен в браузере по адресу http://<IP-адрес-сервера>/.')
 
-# ---------------- 7. Полные листинги ----------------
-doc.add_heading('7. Полные листинги сценариев развёртывания', level=1)
-doc.add_heading('7.1 install.sh — загрузчик (клонирование и запуск)', level=2)
-code(open(r'C:\Users\Admin03\Desktop\proekt\mirigrushek\install.sh', encoding='utf-8').read(), size=8.5)
-doc.add_heading('7.2 setup.sh — установка LAMP, БД и сайта', level=2)
-code(open(r'C:\Users\Admin03\Desktop\proekt\mirigrushek\setup.sh', encoding='utf-8').read(), size=8.5)
-
-# ---------------- 8. Сводная таблица команд ----------------
-doc.add_heading('8. Сводная таблица использованных команд', level=1)
+# ============================ 7. Сводная таблица команд ============================
+doc.add_heading('7. Сводная таблица использованных команд', level=1)
 table(['Команда', 'Назначение'],
-      [['python generate_sql.py', 'Генерация init.sql из файлов импорта Excel'],
-       ['git init / add / commit', 'Инициализация репозитория и фиксация изменений'],
-       ['gh repo create … --push', 'Создание публичного репозитория и публикация на GitHub'],
-       ['git push origin main', 'Отправка изменений в удалённый репозиторий'],
-       ['curl -fsSL … | sudo bash', 'Установка системы на сервер одной командой'],
-       ['apt-get update / install', 'Установка Apache, MySQL, PHP, git'],
-       ['systemctl enable --now / restart / reload', 'Управление службами Apache и MySQL'],
-       ['sed -i … bind-address', 'Разрешение сетевых подключений к MySQL'],
-       ['mysql -u root < init.sql', 'Создание БД и загрузка данных'],
-       ['CREATE USER / GRANT', 'Настройка root для подключения отовсюду (Workbench)'],
-       ['rm /var/www/html/index.html', 'Удаление приветственной страницы Apache'],
-       ['a2enmod php*, DirectoryIndex', 'Назначение index.php индексной страницей'],
-       ['cp -rf web/. /var/www/html', 'Развёртывание файлов сайта'],
-       ['chown -R www-data', 'Назначение владельца файлов веб-сервера'],
-       ['ufw allow 80/3306', 'Открытие портов сайта и СУБД'],
-       ['hostname -I', 'Определение IP-адреса сервера']],
-      [3.6, 5.5])
+      [['hostname -I', 'Определение IP-адреса сервера'],
+       ['sudo apt update / upgrade -y', 'Обновление списков и пакетов ОС'],
+       ['sudo apt install -y mysql-server', 'Установка СУБД MySQL'],
+       ['sudo apt install -y apache2 php …', 'Установка веб-сервера Apache и PHP'],
+       ['sudo systemctl enable --now …', 'Автозапуск и запуск служб MySQL и Apache'],
+       ['sudo systemctl restart / reload …', 'Перезапуск служб после изменения настроек'],
+       ['mysql -u root -p', 'Подключение к СУБД'],
+       ['CREATE DATABASE … / USE …', 'Создание и выбор базы данных'],
+       ['CREATE TABLE …', 'Создание таблиц, полей, ключей и связей'],
+       ['INSERT INTO …', 'Загрузка (импорт) данных в таблицы'],
+       ['SHOW TABLES; / DESCRIBE …', 'Просмотр списка таблиц и структуры таблицы'],
+       ['SELECT … (с JOIN, WHERE, ORDER BY)', 'Вывод и выборка данных, поиск, сортировка, фильтр'],
+       ['UPDATE … / DELETE …', 'Редактирование и удаление товаров и заказов'],
+       ['CREATE USER / GRANT / FLUSH', 'Настройка root для подключения отовсюду'],
+       ['sudo rm /var/www/html/index.html', 'Удаление приветственной страницы Apache'],
+       ['sudo cp -r … /var/www/html/', 'Размещение файлов приложения на сервере'],
+       ['sudo chown -R www-data …', 'Назначение владельца файлов веб-сервера'],
+       ['sudo ufw allow 80/3306', 'Открытие портов сайта и СУБД']],
+      [3.7, 5.4])
 
-# ---------------- 9. Проверка ----------------
-doc.add_heading('9. Проверка работоспособности', level=1)
+# ============================ 8. Проверка ============================
+doc.add_heading('8. Проверка работоспособности', level=1)
 bullets([
     'Сайт открывается по адресу http://<IP-сервера>/ — отображается окно входа, затем каталог.',
-    'Подключение в MySQL Workbench: host=<IP>, port=3306, user=root, пароль Xmpl123!.',
-    'Вход под ролями (администратор / менеджер / клиент) и проверка прав доступа.',
-    'Файл отчёта доступен на сервере: http://<IP-сервера>/report.docx.',
+    'Вход выполнен под ролями (администратор / менеджер / клиент), права доступа разграничены.',
+    'Подключение в MySQL Workbench: host = <IP>, port = 3306, user = root, пароль Xmpl123!.',
 ])
 para('Проведена отладка: приложение работает корректно, аварийного завершения не происходит '
-     '(валидация ввода, обработка исключений, защита от удаления связанных записей). '
-     'Скриншоты корректной работы приложения:', italic=True, after=8)
-
-from PIL import Image, ImageChops
-
-def trim_bottom(path):
-    im = Image.open(path).convert('RGB')
-    bg = Image.new('RGB', im.size, (255, 255, 255))
-    bbox = ImageChops.difference(im, bg).getbbox()
-    if bbox:
-        b = min(im.height, bbox[3] + 14)
-        im.crop((0, 0, im.width, b)).save(path)
-
-def figure(path, caption, width=6.3):
-    trim_bottom(path)
-    p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p.paragraph_format.space_before = Pt(4); p.paragraph_format.space_after = Pt(2)
-    p.add_run().add_picture(path, width=Inches(width))
-    para(caption, italic=True, size=10, align=WD_ALIGN_PARAGRAPH.CENTER, after=14)
-
-SCR = r'C:\Users\Admin03\Desktop\proekt\mirigrushek\build\_screens'
+     '(валидация ввода, обработка исключений, защита связанных записей от удаления). '
+     'Скриншоты корректной работы приложения приведены ниже.', italic=True, after=8)
 figure(SCR + r'\login.png',   'Рисунок 1 — окно входа и регистрации (стартовый экран)')
 figure(SCR + r'\catalog.png', 'Рисунок 2 — каталог: фон #FFDEAD при скидке свыше 17%, '
        'перечёркнутая основная цена и итоговая цена, голубая подсветка товара, которого нет на складе')
 figure(SCR + r'\orders.png',  'Рисунок 3 — список заказов (роль «Администратор»)')
+
+# ============================ Приложение А: SQL ============================
+doc.add_page_break()
+doc.add_heading('Приложение А. Полный SQL-код базы данных', level=1)
+para('Ниже приведён полный SQL-код, использованный для создания базы данных, всех таблиц, '
+     'связей и загрузки данных.', after=8)
+sql = io.open(ROOT + r'\init.sql', encoding='utf-8').read().strip('\n')
+for block in re.split(r'\n\s*\n', sql):
+    block = block.strip('\n')
+    if block.strip():
+        code(block, size=8)
 
 doc.save(OUT)
 print('saved', OUT)
