@@ -41,6 +41,7 @@ rm -f "$WEBROOT/index.html"
 mkdir -p "$WEBROOT/images"
 cp -rf "$HERE/web/." "$WEBROOT/"
 [[ -d "$HERE/images" ]] && cp -rf "$HERE/images/." "$WEBROOT/images/"
+[[ -f "$HERE/report.docx" ]] && cp -f "$HERE/report.docx" "$WEBROOT/report.docx"
 chown -R www-data:www-data "$WEBROOT"
 a2enmod php* >/dev/null 2>&1 || true
 if ! grep -q 'DirectoryIndex index.php' /etc/apache2/mods-enabled/dir.conf 2>/dev/null; then
