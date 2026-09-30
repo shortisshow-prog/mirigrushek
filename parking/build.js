@@ -20,8 +20,8 @@ const I=f=>__dirname+'/img/'+f;
 let N=1; const T_=(s,t)=>title(s,t,++N);
 const cap=(s,t,x,y,w)=>s.addText(t,{x,y,w,h:0.35,fontFace:B,fontSize:12,color:M,margin:0,isTextBox:true});
 const src=(s,t)=>s.addText(t,{x:0.6,y:6.95,w:12.1,h:0.35,fontFace:B,fontSize:10,color:M,margin:0,isTextBox:true});
-const NEW=107, MGN=2; // по схеме: фасад 38, площадка 20к2 18, газон у д. 22 42, западный въезд 9
-const GR=[['F2C200','Вдоль фасада',38],['EA580C','Площадка у 20к2',18],['16A34A','У газона д. 22',42],['9333EA','У западного въезда',9]];
+const NEW=73, MGN=2; // по схеме: фасад 36, площадка 20к2 12, газон у д. 22 16, западный въезд 9
+const GR=[['F2C200','Вдоль фасада',36],['EA580C','Площадка у 20к2',12],['16A34A','У газона д. 22',16],['9333EA','У западного въезда',9]];
 
 // 1 Title
 let s=p.addSlide(); s.background={color:D};
@@ -90,7 +90,7 @@ s.addText(['Машины стоят вдоль внутридворового п
 s=p.addSlide(); T_(s,'Цель и задачи проекта');
 s.addShape(p.shapes.ROUNDED_RECTANGLE,{x:0.6,y:1.4,w:12.1,h:1.2,fill:{color:Y},rectRadius:0.12});
 s.addText([{text:'ЦЕЛЬ:  ',options:{bold:true}},{text:'обустроить '+NEW+' новых парковочных мест во дворе МКД ул. Нахимова, 20 и поставить шлагбаум на восточном въезде.'}],{x:0.9,y:1.4,w:11.6,h:1.2,valign:'middle',fontFace:B,fontSize:20,color:D,margin:0,isTextBox:true});
-const tasks=['Обследовать двор по снимкам и на месте, получить решение ОСС','Демонтировать газон ≈ 1 340 м² в зонах новых мест','Устроить основание и асфальт на '+NEW+' мест','Поставить шлагбаум, освещение, водоотвод, разметку','Рассчитать смету, зарплату, технику и график'];
+const tasks=['Обследовать двор по снимкам и на месте, получить решение ОСС','Демонтировать газон ≈ 915 м² в зонах новых мест','Устроить основание и асфальт на '+NEW+' мест','Поставить шлагбаум, освещение, водоотвод, разметку','Рассчитать смету, зарплату, технику и график'];
 tasks.forEach((t,i)=>{const x=0.6+i*2.46;
  s.addShape(p.shapes.ROUNDED_RECTANGLE,{x,y:3.0,w:2.25,h:3.6,fill:{color:L},rectRadius:0.1});
  s.addShape(p.shapes.OVAL,{x:x+0.2,y:3.2,w:0.7,h:0.7,fill:{color:D}});
@@ -105,7 +105,7 @@ s.addText('Новые места: '+NEW,{x:9.0,y:1.35,w:3.7,h:0.45,fontFace:B,fo
 GR.concat([['2563EB','Для МГН (в ряду у фасада)',MGN],['DC2626','Новый шлагбаум (восточный въезд)',1]]).forEach((r,i)=>{const y=1.95+i*0.5;
  s.addShape(p.shapes.RECTANGLE,{x:9.0,y:y+0.07,w:0.36,h:0.28,fill:{color:r[0]}});
  s.addText(r[1]+(i<4?' — '+r[2]:''),{x:9.5,y,w:3.3,h:0.42,fontFace:B,fontSize:12,color:T,margin:0,valign:'middle',isTextBox:true});});
-s.addText(['Места 2,5 × 5 м, перпендикулярно проезду','Проезды 6 м сохраняются','Площадь нового покрытия ≈ 1 340 м²','Размещение — по схеме заказчика'].map((t,i,a)=>({text:t,options:{bullet:true,breakLine:i<a.length-1}})),{x:9.0,y:5.05,w:3.7,h:1.8,fontFace:B,fontSize:12,color:T,paraSpaceAfter:4,margin:0,valign:'top',isTextBox:true});
+s.addText(['Места 2,5 × 5 м, перпендикулярно проезду','Проезды 6 м сохраняются','Площадь нового покрытия ≈ 915 м²','Размещение — по схеме заказчика'].map((t,i,a)=>({text:t,options:{bullet:true,breakLine:i<a.length-1}})),{x:9.0,y:5.05,w:3.7,h:1.8,fontFace:B,fontSize:12,color:T,paraSpaceAfter:4,margin:0,valign:'top',isTextBox:true});
 src(s,'Подложка: Яндекс Карты. Масштаб 1 px ≈ 0,3 м. Схема — проектное предложение, требует геодезической съёмки и решения ОСС.');
 
 // 10 Before / after
@@ -121,12 +121,12 @@ s.addText('Что получится',{x:6.9,y:4.35,w:5.8,h:0.4,fontFace:B,fontS
 s.addText(['+'+NEW+' новых мест в 4 зонах','Шлагбаум на восточном въезде','Свободный проезд для скорой и пожарной техники','Освещение, водоотвод, разметка','Компенсационное озеленение'].map((t,i,a)=>({text:t,options:{bullet:true,breakLine:i<a.length-1}})),{x:6.9,y:4.8,w:5.8,h:2.1,fontFace:B,fontSize:14,color:T,paraSpaceAfter:6,margin:0,valign:'top',isTextBox:true});
 
 // data (расчёт от площади по схеме: 265 м², ряд 54 м)
-const A=1340, Ldep=0.65*A;
-const tech=[['Экскаватор-погрузчик JCB 3CX (с машинистом)','маш.-ч',64,3200],['Самосвал КАМАЗ 65115 (вывоз грунта '+Math.round(Ldep)+' м³)','рейс',87,6500],['Каток дорожный 6 т','маш.-ч',40,2800],['Асфальтоукладчик','маш.-ч',24,6500],['Виброплита, инструмент','сут',25,1500]];
-const staff=[['Прораб','1',35,4500],['Дорожные рабочие','6',30,3500],['Разнорабочие','3',20,2800],['Электромонтажник','1',8,4000]];
+const A=915, Ldep=0.65*A;
+const tech=[['Экскаватор-погрузчик JCB 3CX (с машинистом)','маш.-ч',44,3200],['Самосвал КАМАЗ 65115 (вывоз грунта '+Math.round(Ldep)+' м³)','рейс',60,6500],['Каток дорожный 6 т','маш.-ч',28,2800],['Асфальтоукладчик','маш.-ч',16,6500],['Виброплита, инструмент','сут',18,1500]];
+const staff=[['Прораб (весь срок, 9 недель)','1',45,4500],['Дорожные рабочие','6',25,3500],['Разнорабочие','3',20,2800],['Электромонтажник','1',8,4000]];
 const ts=tech.map(r=>r[2]*r[3]), techSum=ts.reduce((a,b)=>a+b);
 const ss=staff.map(r=>r[1]*r[2]*r[3]), fot=ss.reduce((a,b)=>a+b), ins=fot*0.3, zp=fot+ins;
-const mat=[['Демонтаж газона '+A+' м², выемка грунта '+Math.round(Ldep)+' м³',A*60+Math.round(Ldep)*650],['Геотекстиль '+A+' м², песок '+Math.round(A*0.3)+' м³, щебень '+Math.round(A*0.25)+' м³',A*90+Math.round(A*0.3)*1400+Math.round(A*0.25)*2600],['Асфальтобетон в 2 слоя, '+A+' м²',A*1250],['Бордюр БР 100.30.15 с установкой, 420 м',420*1300],['Водоотвод: лотки 90 м + 3 дождеприёмника',290000],['Освещение: 6 опор LED с кабелем',330000],['Разметка '+NEW+' мест (термопластик) + знаки МГН',NEW*1400+12000],['Шлагбаум автомат. с GSM на восточном въезде + монтаж',245000],['Компенсационное озеленение',40000],['Геодезия, проект и согласования',90000]];
+const mat=[['Демонтаж газона '+A+' м², выемка грунта '+Math.round(Ldep)+' м³',A*60+Math.round(Ldep)*650],['Геотекстиль '+A+' м², песок '+Math.round(A*0.3)+' м³, щебень '+Math.round(A*0.25)+' м³',A*90+Math.round(A*0.3)*1400+Math.round(A*0.25)*2600],['Асфальтобетон в 2 слоя, '+A+' м²',A*1250],['Бордюр БР 100.30.15 с установкой, 300 м',300*1300],['Водоотвод: лотки 70 м + 2 дождеприёмника',215000],['Освещение: 5 опор LED с кабелем',275000],['Разметка '+NEW+' мест (термопластик) + знаки МГН',NEW*1400+12000],['Шлагбаум автомат. с GSM на восточном въезде + монтаж',245000],['Компенсационное озеленение',40000],['Геодезия, проект и согласования',90000]];
 const matSum=mat.reduce((a,r)=>a+r[1],0);
 const sub=matSum+techSum+zp, res=sub*0.05, total=sub+res;
 console.log({techSum,fot,zp,matSum,total});
@@ -144,7 +144,7 @@ src(s,note);
 s=p.addSlide(); T_(s,'Расчёт заработной платы');
 s.addTable([['Должность','Чел.','Дней','Ставка ₽/день','ФОТ, ₽'].map(t=>({text:t,options:{bold:true,color:W,fill:{color:D}}}))].concat(staff.map((r,i)=>[r[0],r[1],String(r[2]),fmt(r[3]),fmt(ss[i])])).concat([[{text:'Фонд оплаты труда',options:{bold:true,colspan:4}},{text:fmt(fot),options:{bold:true}}],[{text:'Страховые взносы 30 %',options:{colspan:4}},fmt(ins)],[{text:'Итого зарплата с взносами',options:{bold:true,colspan:4,fill:{color:Y}}},{text:fmt(zp),options:{bold:true,fill:{color:Y}}}]]),{x:0.6,y:1.5,w:8.4,colW:[3.6,0.8,0.9,1.6,1.5],fontFace:B,fontSize:13,color:T,rowH:0.52,border:{type:'solid',color:'E5E7EB',pt:1},valign:'middle'});
 s.addText('Формула',{x:9.4,y:1.5,w:3.3,h:0.4,fontFace:B,fontSize:16,bold:true,color:T,margin:0,isTextBox:true});
-s.addText('ФОТ = численность × дни × дневная ставка\n\nВзносы = ФОТ × 30 %\n\nБригада: 11 человек.',{x:9.4,y:2.0,w:3.3,h:3.5,fontFace:B,fontSize:14,color:T,margin:0,valign:'top',isTextBox:true});
+s.addText('ФОТ = численность × дни × дневная ставка\n\nВзносы = ФОТ × 30 %\n\nБригада: 11 человек.\n\nПрораб ведёт объект весь срок — 9 недель = 45 рабочих дней (подготовка, согласования, работы, приёмка). Рабочие заняты только на стройке — 5 недель.',{x:9.4,y:2.0,w:3.3,h:4.6,fontFace:B,fontSize:12,color:T,margin:0,valign:'top',isTextBox:true});
 src(s,note);
 
 // 13 Smeta
@@ -171,7 +171,7 @@ s.addText('Подготовка — 4 недели; строительство �
 // 15 Result
 s=p.addSlide(); s.background={color:D};
 s.addText('Выполнение задач и итог',{x:0.6,y:0.4,w:12,h:0.8,fontFace:H,fontSize:34,bold:true,color:W,margin:0,isTextBox:true});
-const done=['Двор обследован по снимкам и панорамам Яндекс Карт','Размещено '+NEW+' новых мест в 4 зонах двора (≈ 1 340 м²)','Спроектировано покрытие: основание + асфальт в 2 слоя','Шлагбаум на въезде, освещение, водоотвод, места для МГН','Рассчитаны смета, ЗП, техника и график — 9 недель'];
+const done=['Двор обследован по снимкам и панорамам Яндекс Карт','Размещено '+NEW+' новых мест в 4 зонах двора (≈ 915 м²)','Спроектировано покрытие: основание + асфальт в 2 слоя','Шлагбаум на въезде, освещение, водоотвод, места для МГН','Рассчитаны смета, ЗП, техника и график — 9 недель'];
 done.forEach((t,i)=>{const y=1.45+i*0.78;
  s.addShape(p.shapes.OVAL,{x:0.6,y,w:0.55,h:0.55,fill:{color:Y}});
  s.addText('✓',{x:0.6,y,w:0.55,h:0.55,align:'center',valign:'middle',fontSize:18,bold:true,color:D,margin:0,isTextBox:true});
@@ -180,5 +180,12 @@ s.addText('+'+NEW,{x:8.3,y:1.4,w:4.4,h:1.4,fontFace:H,fontSize:72,bold:true,colo
 s.addText('новых парковочных мест',{x:8.3,y:2.8,w:4.4,h:0.5,fontFace:B,fontSize:18,color:W,margin:0,align:'center',isTextBox:true});
 s.addText(fmt(total)+' ₽  ·  9 недель',{x:8.3,y:3.6,w:4.4,h:0.5,fontFace:B,fontSize:18,bold:true,color:W,margin:0,align:'center',isTextBox:true});
 s.addText('Цель достигнута: +'+NEW+' мест, въезд под контролем шлагбаума.',{x:8.3,y:4.4,w:4.4,h:1.2,fontFace:B,fontSize:15,color:'D1D5DB',margin:0,align:'center',valign:'top',isTextBox:true});
-s.addText('Спасибо за внимание!',{x:0.6,y:6.5,w:12,h:0.6,fontFace:H,fontSize:22,color:W,margin:0,isTextBox:true});
+
+// Thanks
+s=p.addSlide(); s.background={color:D};
+s.addImage({path:I('yard_facade.jpg'),x:0,y:0,w:13.33,h:7.5,sizing:{type:'cover',w:13.33,h:7.5},transparency:70});
+s.addShape(p.shapes.RECTANGLE,{x:0,y:0,w:13.33,h:7.5,fill:{color:D,transparency:25}});
+s.addText('Спасибо за внимание!',{x:0.6,y:2.6,w:12.1,h:1.4,fontFace:H,fontSize:54,bold:true,color:W,align:'center',margin:0,isTextBox:true});
+s.addShape(p.shapes.RECTANGLE,{x:5.67,y:4.15,w:2,h:0.08,fill:{color:Y}});
+s.addText('ул. Нахимова, д. 20  ·  +'+NEW+' парковочных мест',{x:0.6,y:4.45,w:12.1,h:0.6,fontFace:B,fontSize:20,color:'E5E7EB',align:'center',margin:0,isTextBox:true});
 p.writeFile({fileName:__dirname+'/Парковка_Нахимова_20.pptx'});
