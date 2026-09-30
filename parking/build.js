@@ -47,8 +47,16 @@ lot(s,7.7,3.5,5,1.6,18,[0.52,0.48],'Слева: 18 мест · справа: г�
 s.addShape(p.shapes.RECTANGLE,{x:7.7,y:5.9,w:2.6,h:0.12,fill:{color:Y}});
 s.addText('шлагбаум (въезд)',{x:10.45,y:5.75,w:2.3,h:0.4,fontSize:12,color:M,fontFace:B,margin:0,isTextBox:true});
 
+// 4 Maps
+s=p.addSlide(); title(s,'Объект на Яндекс Картах',4);
+s.addImage({path:__dirname+'/img/sat.jpg',x:0.6,y:1.5,w:5.2,h:3.6});
+s.addImage({path:__dirname+'/img/pano.jpg',x:6.1,y:1.5,w:6.4,h:3.61});
+s.addText('Спутниковый снимок',{x:0.6,y:5.2,w:5.2,h:0.4,fontFace:B,fontSize:14,bold:true,color:T,margin:0,isTextBox:true});
+s.addText('Панорама с ул. Нахимова',{x:6.1,y:5.2,w:6.4,h:0.4,fontFace:B,fontSize:14,bold:true,color:T,margin:0,isTextBox:true});
+s.addText('Источник: Яндекс Карты (yandex.ru/maps), Санкт-Петербург, ул. Нахимова, д. 20',{x:0.6,y:6.5,w:12.1,h:0.4,fontFace:B,fontSize:12,color:M,margin:0,isTextBox:true});
+
 // 4 Relevance
-s=p.addSlide(); title(s,'Актуальность и понятие благоустройства',4);
+s=p.addSlide(); title(s,'Актуальность и понятие благоустройства',5);
 s.addShape(p.shapes.ROUNDED_RECTANGLE,{x:0.6,y:1.5,w:6.2,h:2.3,fill:{color:D},rectRadius:0.12});
 s.addText([{text:'Благоустройство',options:{bold:true,color:Y,breakLine:true}},{text:'— комплекс мероприятий по содержанию и развитию территории, направленных на повышение комфорта и безопасности жителей (п. 36 ст. 1 ГрК РФ). Придомовая территория входит в состав общего имущества МКД (ст. 36 ЖК РФ), решение о её изменении принимает общее собрание собственников (ст. 44 ЖК РФ).',options:{color:W}}],{x:0.9,y:1.6,w:5.7,h:2.1,fontFace:B,fontSize:14,valign:'middle',margin:0,isTextBox:true});
 [['144','квартиры'],['≈ 95','автомобилей у жителей'],['18','парковочных мест сейчас']].forEach((k,i)=>{const x=0.6+i*2.1;
@@ -58,7 +66,7 @@ s.addText('Проблемы сегодня',{x:7.3,y:1.5,w:5.4,h:0.5,fontFace:B,
 s.addText(['Дефицит мест: ≈ 5 машин на 1 место','Парковка на газоне и тротуарах — вытоптанная трава, грязь','Блокируется проезд пожарной и скорой помощи','Неисправный шлагбаум — во двор заезжают посторонние','Нет освещения и водоотвода, лужи после дождя'].map((t,i,a)=>({text:t,options:{bullet:true,breakLine:i<a.length-1}})),{x:7.3,y:2.1,w:5.4,h:3.6,fontFace:B,fontSize:15,color:T,paraSpaceAfter:10,margin:0,valign:'top',isTextBox:true});
 
 // 5 Goal & tasks
-s=p.addSlide(); title(s,'Цель и задачи проекта',5);
+s=p.addSlide(); title(s,'Цель и задачи проекта',6);
 s.addShape(p.shapes.ROUNDED_RECTANGLE,{x:0.6,y:1.4,w:12.1,h:1.2,fill:{color:Y},rectRadius:0.12});
 s.addText([{text:'ЦЕЛЬ:  ',options:{bold:true}},{text:'увеличить количество парковочных мест на придомовой территории МКД ул. Нахимова, 20 с 18 до 38.'}],{x:0.9,y:1.4,w:11.6,h:1.2,valign:'middle',fontFace:B,fontSize:20,color:D,margin:0,isTextBox:true});
 const tasks=['Обследовать территорию и получить решение общего собрания собственников','Демонтировать озеленение (газон 450 м², 6 деревьев) и старый бордюр','Устроить основание и асфальтовое покрытие на 20 новых мест','Заменить шлагбаум, сделать освещение и водоотвод','Рассчитать смету, зарплату, технику и график работ'];
@@ -70,7 +78,7 @@ tasks.forEach((t,i)=>{const x=0.6+i*2.46;
  s.addText(t,{x:x+0.2,y:4.45,w:1.9,h:2.0,fontSize:14,color:T,fontFace:B,margin:0,valign:'top',isTextBox:true});});
 
 // 6 Before / after
-s=p.addSlide(); title(s,'Что нужно и что получится',6);
+s=p.addSlide(); title(s,'Что нужно и что получится',7);
 s.addText('БЫЛО',{x:0.6,y:1.4,w:5.8,h:0.5,fontFace:B,fontSize:18,bold:true,color:M,margin:0,isTextBox:true});
 lot(s,0.6,2.0,5.8,1.7,18,[0.52,0.48],'18 мест + газон 450 м²');
 s.addText('СТАНЕТ',{x:6.9,y:1.4,w:5.8,h:0.5,fontFace:B,fontSize:18,bold:true,color:G,margin:0,isTextBox:true});
@@ -92,7 +100,7 @@ const sub=matSum+techSum+zp, res=sub*0.05, total=sub+res;
 console.log({techSum,fot,zp,matSum,total});
 
 // 7 Tech
-s=p.addSlide(); title(s,'Техника и механизмы',7);
+s=p.addSlide(); title(s,'Техника и механизмы',8);
 s.addTable([[ 'Техника','Ед.','Кол-во','Цена, ₽','Сумма, ₽'].map(t=>({text:t,options:{bold:true,color:W,fill:{color:D}}}))].concat(tech.map((r,i)=>[r[0],r[1],String(r[2]),fmt(r[3]),fmt(ts[i])])).concat([[{text:'Итого техника',options:{bold:true,colspan:4}},{text:fmt(techSum),options:{bold:true}}]]),{x:0.6,y:1.5,w:8.4,colW:[4.2,0.9,1.0,1.1,1.2],fontFace:B,fontSize:13,color:T,rowH:0.55,border:{type:'solid',color:'E5E7EB',pt:1},valign:'middle'});
 s.addShape(p.shapes.ROUNDED_RECTANGLE,{x:9.4,y:1.5,w:3.3,h:2.4,fill:{color:D},rectRadius:0.12});
 s.addText(fmt(techSum)+' ₽',{x:9.6,y:1.7,w:2.9,h:1,fontFace:H,fontSize:30,bold:true,color:Y,margin:0,isTextBox:true});
@@ -100,13 +108,13 @@ s.addText('аренда техники с операторами',{x:9.6,y:2.7,w
 s.addText('Цены — средние ставки аренды спецтехники в регионе, 2026 г. Топливо и работа машинистов включены.',{x:9.4,y:4.2,w:3.3,h:1.5,fontFace:B,fontSize:12,color:M,margin:0,valign:'top',isTextBox:true});
 
 // 8 Salary
-s=p.addSlide(); title(s,'Расчёт заработной платы',8);
+s=p.addSlide(); title(s,'Расчёт заработной платы',9);
 s.addTable([['Должность','Чел.','Дней','Ставка ₽/день','ФОТ, ₽'].map(t=>({text:t,options:{bold:true,color:W,fill:{color:D}}}))].concat(staff.map((r,i)=>[r[0],r[1],String(r[2]),fmt(r[3]),fmt(ss[i])])).concat([[{text:'Фонд оплаты труда',options:{bold:true,colspan:4}},{text:fmt(fot),options:{bold:true}}],[{text:'Страховые взносы 30 %',options:{colspan:4}},fmt(ins)],[{text:'Итого зарплата с взносами',options:{bold:true,colspan:4,fill:{color:Y}}},{text:fmt(zp),options:{bold:true,fill:{color:Y}}}]]),{x:0.6,y:1.5,w:8.4,colW:[3.6,0.8,0.9,1.6,1.5],fontFace:B,fontSize:13,color:T,rowH:0.52,border:{type:'solid',color:'E5E7EB',pt:1},valign:'middle'});
 s.addText('Формула',{x:9.4,y:1.5,w:3.3,h:0.4,fontFace:B,fontSize:16,bold:true,color:T,margin:0,isTextBox:true});
 s.addText('ФОТ = численность × дни × дневная ставка\n\nВзносы = ФОТ × 30 %\n\nБригада: 9 человек, пик — 7 человек на объекте одновременно.',{x:9.4,y:2.0,w:3.3,h:3.5,fontFace:B,fontSize:14,color:T,margin:0,valign:'top',isTextBox:true});
 
 // 9 Smeta
-s=p.addSlide(); title(s,'Смета проекта',9);
+s=p.addSlide(); title(s,'Смета проекта',10);
 const body=mat.map(r=>[r[0],fmt(r[1])]);
 s.addTable([[{text:'Материалы и работы',options:{bold:true,color:W,fill:{color:D}}},{text:'Сумма, ₽',options:{bold:true,color:W,fill:{color:D}}}]].concat(body),{x:0.6,y:1.4,w:7.4,colW:[5.8,1.6],fontFace:B,fontSize:12,color:T,rowH:0.41,border:{type:'solid',color:'E5E7EB',pt:1},valign:'middle'});
 const sum=[['Материалы и работы',matSum],['Техника',techSum],['Зарплата с взносами',zp],['Непредвиденные 5 %',res]];
@@ -118,7 +126,7 @@ s.addText(fmt(total)+' ₽',{x:8.75,y:4.55,w:3.8,h:0.8,fontFace:H,fontSize:30,bo
 s.addText([{text:'≈ '+fmt(total/144)+' ₽',options:{bold:true}},{text:' с квартиры (144 кв.) или '},{text:'≈ '+fmt(total/20)+' ₽',options:{bold:true}},{text:' за одно новое место. Источник — фонд текущего ремонта / целевой сбор по решению ОСС.'}],{x:8.5,y:5.75,w:4.2,h:1.2,fontFace:B,fontSize:12,color:T,margin:0,valign:'top',isTextBox:true});
 
 // 10 Gantt
-s=p.addSlide(); title(s,'Сроки выполнения работ',10);
+s=p.addSlide(); title(s,'Сроки выполнения работ',11);
 const st=[['ОСС, проект, согласования, порубочный билет',0,4],['Спил деревьев, корчевание, демонтаж',4,1],['Земляные работы и вывоз грунта',5,1],['Основание: песок, щебень, бордюр, водоотвод',6,1.6],['Асфальтирование',7.4,0.6],['Шлагбаум и освещение',7.4,0.8],['Разметка, озеленение, приёмка',8,1]];
 const gx=5.2,gw=7.5,nw=9; for(let i=0;i<nw;i++){s.addText('Нед. '+(i+1),{x:gx+i*gw/nw,y:1.4,w:gw/nw,h:0.4,align:'center',fontSize:11,color:M,fontFace:B,margin:0,isTextBox:true});
  s.addShape(p.shapes.LINE,{x:gx+i*gw/nw,y:1.85,w:0,h:4.6,line:{color:'E5E7EB',width:1}});}
