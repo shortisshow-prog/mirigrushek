@@ -21,7 +21,7 @@ let N=1; const T_=(s,t)=>title(s,t,++N);
 const cap=(s,t,x,y,w)=>s.addText(t,{x,y,w,h:0.35,fontFace:B,fontSize:12,color:M,margin:0,isTextBox:true});
 const src=(s,t)=>s.addText(t,{x:0.6,y:6.95,w:12.1,h:0.35,fontFace:B,fontSize:10,color:M,margin:0,isTextBox:true});
 const NEW=171, MGN=2; // по схеме заказчика, места 2,5×5 м с равным шагом
-const GR=[['F2C200','Вдоль фасада',40],['F2C200','Вокруг д. 22',33],['F2C200','Площадка у 20к2',29],['F2C200','Въезд с Малого пр.',35],['F2C200','Западный въезд',24],['F2C200','Западное крыло',10]];
+const GR=[['D6D9DE','Вдоль фасада',40],['D6D9DE','Вокруг д. 22',33],['D6D9DE','Площадка у 20к2',29],['D6D9DE','Въезд с Малого пр.',35],['D6D9DE','Западный въезд',24],['D6D9DE','Западное крыло',10]];
 
 // 1 Title
 let s=p.addSlide(); s.background={color:D};
@@ -102,7 +102,7 @@ tasks.forEach((t,i)=>{const x=0.6+i*2.46;
 s=p.addSlide(); T_(s,'План парковочных мест во дворе');
 s.addImage({path:I('plan_map.jpg'),x:0.6,y:1.6,w:8.1,h:3.91});
 s.addText('Новые места: '+NEW,{x:9.0,y:1.35,w:3.7,h:0.45,fontFace:B,fontSize:18,bold:true,color:T,margin:0,isTextBox:true});
-GR.concat([['2563EB','Для МГН (в ряду у фасада)',MGN],['000000','Шлагбаумы (2 въезда)',2]]).forEach((r,i)=>{const y=1.9+i*0.42;
+GR.concat([['2563EB','Для МГН (в ряду у фасада)',MGN],['DC2626','Шлагбаумы (2 въезда)',2]]).forEach((r,i)=>{const y=1.9+i*0.42;
  s.addShape(p.shapes.RECTANGLE,{x:9.0,y:y+0.07,w:0.36,h:0.28,fill:{color:r[0]}});
  s.addText(r[1]+(i<6?' — '+r[2]:''),{x:9.5,y,w:3.3,h:0.42,fontFace:B,fontSize:12,color:T,margin:0,valign:'middle',isTextBox:true});});
 s.addText(['Все места одного размера 2,5 × 5 м, с равным шагом','Проезды 6 м сохраняются','Площадь нового покрытия ≈ 2 140 м²','Размещение — по схеме заказчика'].map((t,i,a)=>({text:t,options:{bullet:true,breakLine:i<a.length-1}})),{x:9.0,y:5.4,w:3.7,h:1.5,fontFace:B,fontSize:12,color:T,paraSpaceAfter:4,margin:0,valign:'top',isTextBox:true});
