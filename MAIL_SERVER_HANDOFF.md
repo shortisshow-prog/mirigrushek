@@ -144,5 +144,5 @@ firewall — Y, restart firewall — Y. Потом `reboot`.
 - DNAT на VDS без SNAT + policy routing на сервере (ответы с 10.8.0.2 → wg0), чтобы fail2ban видел реальные IP.
 - Следующий шаг: получить от пользователя вывод hostnamectl/nproc/free/lsblk/df, проверку доступа к 46.23.98.137:22 и curl ifconfig.me.
 - Лимит вложений: по умолчанию ~10 МБ. Пользователю дана команда поднять до 25 МБ: postfix message_size_limit=36700160,
-  php upload_max_filesize=25M / post_max_size=36M, nginx client_max_body_size 36m. Применение не подтверждено.
+  php upload_max_filesize=25M / post_max_size=36M, nginx client_max_body_size 36m. Применено и проверено на VDS.
   Повторить те же значения на большом сервере.
