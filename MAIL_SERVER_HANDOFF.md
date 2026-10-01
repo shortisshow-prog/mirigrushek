@@ -119,9 +119,9 @@ firewall — Y, restart firewall — Y. Потом `reboot`.
 - [x] ClamAV отключён (systemctl disable clamav-daemon clamav-freshclam; amavis @bypass_virus_checks_maps = (1))
 - [x] fail2ban: был failed (нет /var/log/mail.log) → touch mail.log + restart; 6 jails активны
 - [x] DKIM: селектор `dkim`, ключ /var/lib/dkim/colm.spb.ru.pem (показать: amavisd showkeys)
-- [ ] Пользователь вносит в reg.ru: MX @ → mail.colm.spb.ru (10); TXT @ "v=spf1 mx -all";
+- [x] (внесено, проверено) MX @ → mail.colm.spb.ru (10); TXT @ "v=spf1 mx -all";
       TXT dkim._domainkey (ключ); TXT _dmarc "v=DMARC1; p=quarantine; rua=mailto:postmaster@colm.spb.ru; adkim=s; aspf=s";
       CNAME autoconfig/autodiscover → mail.colm.spb.ru
-- [ ] Let's Encrypt (certbot --nginx / webroot), заменить самоподписанный сертификат в nginx, postfix, dovecot
+- [x] Let's Encrypt: certbot --standalone с pre/post-hook stop/start nginx (webroot /var/www/html дал 404); симлинки в /etc/ssl/certs/iRedMail.crt и /etc/ssl/private/iRedMail.key; deploy-hook в cli.ini
 - [ ] Тест отправки (mail-tester), служебные ящики, ящики преподавателей, памятка
 - [ ] Удалить VDS 95.140.148.181; сменить пароль root, SSH-ключ
