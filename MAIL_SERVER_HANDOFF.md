@@ -112,3 +112,16 @@ firewall — Y, restart firewall — Y. Потом `reboot`.
 - SSH 22 доступен извне (check-host: RU, DE — ок). Проверить из колледжа через pfSense Test Port.
 - Нужно: в reg.ru изменить A mail → 46.23.98.137; у VDSka PTR 46.23.98.137 → mail.colm.spb.ru.
 - Дальше: Шаг 1 (подготовка, hostname/hosts с новым IP) и установка iRedMail. Все команды выше — заменить 95.140.148.181 на 46.23.98.137.
+
+## Прогресс на 46.23.98.137
+- [x] A mail → 46.23.98.137 (reg.ru), PTR 46.23.98.137 → mail.colm.spb.ru (VDSka) — проверено
+- [x] iRedMail 1.8.8 установлен (Nginx, MariaDB, Roundcube, iRedAdmin, Fail2ban, без SOGo), firewall nftables
+- [x] ClamAV отключён (systemctl disable clamav-daemon clamav-freshclam; amavis @bypass_virus_checks_maps = (1))
+- [x] fail2ban: был failed (нет /var/log/mail.log) → touch mail.log + restart; 6 jails активны
+- [x] DKIM: селектор `dkim`, ключ /var/lib/dkim/colm.spb.ru.pem (показать: amavisd showkeys)
+- [ ] Пользователь вносит в reg.ru: MX @ → mail.colm.spb.ru (10); TXT @ "v=spf1 mx -all";
+      TXT dkim._domainkey (ключ); TXT _dmarc "v=DMARC1; p=quarantine; rua=mailto:postmaster@colm.spb.ru; adkim=s; aspf=s";
+      CNAME autoconfig/autodiscover → mail.colm.spb.ru
+- [ ] Let's Encrypt (certbot --nginx / webroot), заменить самоподписанный сертификат в nginx, postfix, dovecot
+- [ ] Тест отправки (mail-tester), служебные ящики, ящики преподавателей, памятка
+- [ ] Удалить VDS 95.140.148.181; сменить пароль root, SSH-ключ
