@@ -125,3 +125,6 @@ firewall — Y, restart firewall — Y. Потом `reboot`.
 - [x] Let's Encrypt: certbot --standalone с pre/post-hook stop/start nginx (webroot /var/www/html дал 404); симлинки в /etc/ssl/certs/iRedMail.crt и /etc/ssl/private/iRedMail.key; deploy-hook в cli.ini
 - [ ] Тест отправки (mail-tester), служебные ящики, ящики преподавателей, памятка
 - [ ] Удалить VDS 95.140.148.181; сменить пароль root, SSH-ключ
+- [x] DNS на сервере был сломан (systemd-resolved не резолвил A) → установлен unbound, systemd-resolved отключён,
+      /etc/unbound/unbound.conf.d/local.conf: interface 127.0.0.1, do-ip6 no (IPv6 на сервере нет);
+      /etc/resolv.conf и /var/spool/postfix/etc/resolv.conf → nameserver 127.0.0.1. Письма на mail.ru и mail-tester ушли (status=sent).
