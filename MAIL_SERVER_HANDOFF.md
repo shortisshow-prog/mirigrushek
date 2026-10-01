@@ -128,3 +128,7 @@ firewall — Y, restart firewall — Y. Потом `reboot`.
 - [x] DNS на сервере был сломан (systemd-resolved не резолвил A) → установлен unbound, systemd-resolved отключён,
       /etc/unbound/unbound.conf.d/local.conf: interface 127.0.0.1, do-ip6 no (IPv6 на сервере нет);
       /etc/resolv.conf и /var/spool/postfix/etc/resolv.conf → nameserver 127.0.0.1. Письма на mail.ru и mail-tester ушли (status=sent).
+- [x] mail-tester: 10/10. Отправка на mail.ru и приём с mail.ru работают.
+      Входящие висели в amavis (процессы зависли, пока DNS был сломан) → systemctl restart amavis + postfix flush.
+      Грейлистинг iRedAPD включён (первое письмо от нового сервера задерживается 5–15 мин; SPF-совпадение — без задержки).
+- [ ] СЛЕДУЮЩЕЕ: список преподавателей → ящики, квота, таблица паролей, памятка; удалить VDS 95.140.148.181; passwd root.
