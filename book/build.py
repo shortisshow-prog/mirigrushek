@@ -9,6 +9,8 @@ for f in sorted(glob.glob('part*.txt')):
         if not l.strip(): continue
         if l.startswith('#T '): p=d.add_paragraph(); p.alignment=A.CENTER; r=p.add_run(l[3:]); r.font.size=Pt(20)
         elif l.startswith('#C '): p=d.add_paragraph(); p.alignment=A.CENTER; r=p.add_run(l[3:]); r.font.size=Pt(16)
+        elif l.startswith('#B '): p=d.add_paragraph(); p.alignment=A.JUSTIFY; p.add_run(l[3:]).bold=True
+        elif l.startswith('#I '): p=d.add_paragraph(); p.add_run(l[3:]).italic=True
         elif l.startswith('#H '): p=d.add_paragraph(); p.add_run(l[3:]).bold=True
         else: p=d.add_paragraph(l); p.alignment=A.JUSTIFY
 d.save('Магия_шнура_и_зигзага.docx')
