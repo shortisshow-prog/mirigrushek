@@ -1,0 +1,13 @@
+[Unit]
+Description=VPN portal (3x-ui subscriptions)
+After=network.target x-ui.service
+
+[Service]
+WorkingDirectory=/opt/vpn-portal
+EnvironmentFile=/etc/vpn-portal.env
+ExecStart=/usr/bin/python3 /opt/vpn-portal/server.py
+Restart=always
+User=root
+
+[Install]
+WantedBy=multi-user.target
