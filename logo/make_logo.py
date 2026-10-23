@@ -72,13 +72,6 @@ if MOLD:
     mesh.export(OUT)
     print("mold size mm", mesh.extents, "watertight", mesh.is_watertight)
     sys.exit()
-mesh = trimesh.boolean.union([extrude(outer, FLOOR + POUR_H, 0)], engine="manifold", check_volume=False)
-    cavity = extrude(base, POUR_H + 1, FLOOR)           # полость плашки
-    mark = extrude(pocket, POCKET_D + 0.01, FLOOR - POCKET_D)  # углубление под рельеф
-    mesh = trimesh.boolean.difference([mesh, cavity, mark], engine="manifold", check_volume=False)
-    mesh.export(OUT)
-    print("mold size mm", mesh.extents, "watertight", mesh.is_watertight)
-    sys.exit()
 mesh = trimesh.boolean.union([extrude(base, BASE_H, 0), extrude(logo, RELIEF_H, BASE_H - 0.01)], engine="manifold", check_volume=False)
 mesh.merge_vertices()
 mesh.export(OUT)
