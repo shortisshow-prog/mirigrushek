@@ -62,12 +62,13 @@ def extrude(poly, height, z):
 
 if MOLD:
     # Заливка лицом вниз: рельеф — углубление в дне, поэтому знак зеркалим по X.
-    FLOOR, WALL, POUR_H = 4.0, 3.0, 9.0  # дно, стенка, высота стенок над дном (мм)
+    POCKET_D = 5.0  # глубина углубления под рельеф (мм)
+    FLOOR, WALL, POUR_H = POCKET_D + 2.0, 3.0, 9.0  # дно, стенка, высота стенок над дном (мм)
     pocket = affinity.scale(logo, -1, 1, origin=(w / 2, 0))
     outer = box(-MARGIN - WALL, -MARGIN - WALL, w + MARGIN + WALL, h + MARGIN + WALL)
     mesh = trimesh.boolean.union([extrude(outer, FLOOR + POUR_H, 0)], engine="manifold", check_volume=False)
     cavity = extrude(base, POUR_H + 1, FLOOR)           # полость плашки
-    mark = extrude(pocket, RELIEF_H + 0.01, FLOOR - RELIEF_H)  # углубление под рельеф
+    mark = extrude(pocket, POCKET_D + 0.01, FLOOR - POCKET_D)  # углубление под рельеф
     mesh = trimesh.boolean.difference([mesh, cavity, mark], engine="manifold", check_volume=False)
     mesh.export(OUT)
     print("mold size mm", mesh.extents, "watertight", mesh.is_watertight)
