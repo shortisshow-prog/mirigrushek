@@ -9,7 +9,9 @@ from svgpathtools import parse_path
 
 SVG = sys.argv[1] if len(sys.argv) > 1 else "logo.svg"
 OUT = sys.argv[2] if len(sys.argv) > 2 else "logo.stl"
-LOGO_W, MARGIN, BASE_H, RELIEF_H = 90.0, 5.0, 3.0, 2.0
+MARK_ONLY = "--mark" in sys.argv  # только знак «М», без надписи
+sys.argv = [a for a in sys.argv if a != "--mark"]
+LOGO_W, MARGIN, BASE_H, RELIEF_H = (50.0 if MARK_ONLY else 90.0), (3.0 if MARK_ONLY else 5.0), 3.0, 2.0
 
 def sub_polys(d):
     polys = []
@@ -33,7 +35,7 @@ for el in ET.parse(SVG).getroot().iter():
     elif tag == "polygon":
         v = [float(n) for n in re.findall(r"-?\d*\.?\d+", a["points"])]
         shapes.append(Polygon(list(zip(v[::2], v[1::2]))).buffer(0))
-    elif tag == "path":
+    elif tag == "path" and not MARK_ONLY:
         res = None
         for p in sub_polys(a["d"]):  # чётно-нечётное правило: дырки в «О», «А»
             res = p if res is None else res.symmetric_difference(p)
