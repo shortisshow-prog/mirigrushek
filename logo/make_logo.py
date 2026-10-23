@@ -48,7 +48,9 @@ s = LOGO_W / (maxx - minx)
 logo = affinity.scale(logo, s, -s, origin=(0, 0))  # SVG: ось Y вниз
 minx, miny, maxx, maxy = logo.bounds
 logo = affinity.translate(logo, -minx, -miny)
-logo = logo.buffer(0.04, join_style=2)  # убирает касания в одной точке
+logo = logo.buffer(0.04, join_style=2)
+if MARK_ONLY:  # закрываем тонкие щели между частями знака, чтобы «М» была цельной
+    logo = logo.buffer(0.5, join_style=2).buffer(-0.5, join_style=2)  # убирает касания в одной точке
 w, h = maxx - minx, maxy - miny
 base = box(-MARGIN, -MARGIN, w + MARGIN, h + MARGIN)
 
