@@ -12,7 +12,7 @@ OUT = sys.argv[2] if len(sys.argv) > 2 else "logo.stl"
 MOLD = "--mold" in sys.argv  # форма для заливки гипса (негатив)
 MARK_ONLY = "--mark" in sys.argv or MOLD  # только знак «М», без надписи
 sys.argv = [a for a in sys.argv if a not in ("--mark", "--mold")]
-LOGO_W, MARGIN, BASE_H, RELIEF_H = (50.0 if MARK_ONLY else 90.0), (3.0 if MARK_ONLY else 5.0), 3.0, 2.0
+LOGO_W, MARGIN, BASE_H, RELIEF_H = (50.0 if MARK_ONLY else 90.0), (0.0 if MOLD else 3.0 if MARK_ONLY else 5.0), 3.0, 2.0
 
 def sub_polys(d):
     polys = []
@@ -63,12 +63,16 @@ def extrude(poly, height, z):
     return trimesh.util.concatenate(ms)
 
 if MOLD:
-    # Заливка лицом вниз: рельеф — углубление в дне, поэтому знак зеркалим по X.
-    POCKET_D = 5.0  # глубина углубления под рельеф (мм)
-    FLOOR, WALL, POUR_H = POCKET_D + 2.0, 3.0, 9.0  # дно, стенка, высота стенок над дном (мм)
-    pocket = affinity.scale(logo, -1, 1, origin=(w / 2, 0))
-    outer = box(-MARGIN - WALL, -MARGIN - WALL, w + MARGIN + WALL, h + MARGIN + WALL)
-    mesh = trimesh.boolean.union([extrude(outer, FLOOR + POUR_H, 0)], engine="manifold", check_volume=False)
+    # Форма только под знак: полость повторяет контур «М», отливка — плоская «М» толщиной CAST_H.
+    CAST_H, FLOOR, WALL = 5.0, 2.0, 3.0
+    outer = box(-WALL, -WALL, w + WALL, h + WALL)
+    mesh = extrude(outer, FLOOR + CAST_H, 0)
+    cavity = extrude(logo, CAST_H + 1, FLOOR)
+    mesh = trimesh.boolean.difference([mesh, cavity], engine="manifold", check_volume=False)
+    mesh.export(OUT)
+    print("mold size mm", mesh.extents, "watertight", mesh.is_watertight)
+    sys.exit()
+mesh = trimesh.boolean.union([extrude(outer, FLOOR + POUR_H, 0)], engine="manifold", check_volume=False)
     cavity = extrude(base, POUR_H + 1, FLOOR)           # полость плашки
     mark = extrude(pocket, POCKET_D + 0.01, FLOOR - POCKET_D)  # углубление под рельеф
     mesh = trimesh.boolean.difference([mesh, cavity, mark], engine="manifold", check_volume=False)
