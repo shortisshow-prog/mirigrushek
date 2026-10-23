@@ -9,8 +9,9 @@ from svgpathtools import parse_path
 
 SVG = sys.argv[1] if len(sys.argv) > 1 else "logo.svg"
 OUT = sys.argv[2] if len(sys.argv) > 2 else "logo.stl"
-MARK_ONLY = "--mark" in sys.argv  # только знак «М», без надписи
-sys.argv = [a for a in sys.argv if a != "--mark"]
+MOLD = "--mold" in sys.argv  # форма для заливки гипса (негатив)
+MARK_ONLY = "--mark" in sys.argv or MOLD  # только знак «М», без надписи
+sys.argv = [a for a in sys.argv if a not in ("--mark", "--mold")]
 LOGO_W, MARGIN, BASE_H, RELIEF_H = (50.0 if MARK_ONLY else 90.0), (3.0 if MARK_ONLY else 5.0), 3.0, 2.0
 
 def sub_polys(d):
@@ -59,6 +60,18 @@ def extrude(poly, height, z):
             m = trimesh.creation.extrude_polygon(g, height); m.apply_translation([0, 0, z]); ms.append(m)
     return trimesh.util.concatenate(ms)
 
+if MOLD:
+    # Заливка лицом вниз: рельеф — углубление в дне, поэтому знак зеркалим по X.
+    FLOOR, WALL, POUR_H = 4.0, 3.0, 9.0  # дно, стенка, высота стенок над дном (мм)
+    pocket = affinity.scale(logo, -1, 1, origin=(w / 2, 0))
+    outer = box(-MARGIN - WALL, -MARGIN - WALL, w + MARGIN + WALL, h + MARGIN + WALL)
+    mesh = trimesh.boolean.union([extrude(outer, FLOOR + POUR_H, 0)], engine="manifold", check_volume=False)
+    cavity = extrude(base, POUR_H + 1, FLOOR)           # полость плашки
+    mark = extrude(pocket, RELIEF_H + 0.01, FLOOR - RELIEF_H)  # углубление под рельеф
+    mesh = trimesh.boolean.difference([mesh, cavity, mark], engine="manifold", check_volume=False)
+    mesh.export(OUT)
+    print("mold size mm", mesh.extents, "watertight", mesh.is_watertight)
+    sys.exit()
 mesh = trimesh.boolean.union([extrude(base, BASE_H, 0), extrude(logo, RELIEF_H, BASE_H - 0.01)], engine="manifold", check_volume=False)
 mesh.merge_vertices()
 mesh.export(OUT)
